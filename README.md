@@ -9,7 +9,6 @@ A One Piece pirate-themed personal portfolio for Keerthan Nekkanti.
 - `post-agi.html` — *The Search for AGI · Hunting the All Blue*
 - `post-sensory-ai.html` — *Sensory Devices & AI · Engineering Observation Haki*
 - `post-agentic-ai.html` — *From Bank Vaults to Agentic Crews*
-- `reference.html` — original F1 driver-dossier reference used as the layout starting point
 
 ## Stack
 
