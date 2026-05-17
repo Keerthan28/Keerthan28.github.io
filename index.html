@@ -4,6 +4,19 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Keerthan Nekkanti · Captain's Log · Software · AI · Analytics</title>
+<meta name="description" content="Keerthan Nekkanti — Software Engineer, AI & Analytics navigator. MSBA from Carnegie Mellon Tepper, ex-Bank of America. Building agentic AI systems and sailing the Grand Line of data." />
+<meta name="author" content="Keerthan Nekkanti" />
+<meta property="og:title" content="Keerthan Nekkanti · Captain's Log" />
+<meta property="og:description" content="Software Engineer · AI · Analytics. MSBA Carnegie Mellon Tepper. Ex-Bank of America. Sailing the Grand Line of data." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://keerthan28.github.io/" />
+<meta property="og:image" content="https://keerthan28.github.io/keerthan.jpg" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Keerthan Nekkanti · Captain's Log" />
+<meta name="twitter:description" content="Software Engineer · AI · Analytics. MSBA Carnegie Mellon Tepper. Ex-Bank of America." />
+<meta name="twitter:image" content="https://keerthan28.github.io/keerthan.jpg" />
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+<link rel="alternate icon" href="favicon.svg" />
 <link href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Cinzel:wght@500;700;900&family=IM+Fell+English:ital@0;1&family=Special+Elite&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <style>
@@ -215,6 +228,9 @@
   .wanted .dor{font-family:var(--display);font-weight:900;text-align:center;letter-spacing:0.42em;font-size:0.78rem;margin-bottom:0.6rem;color:var(--ink-2);}
   .wanted .photo{aspect-ratio:1.05/1;background:repeating-linear-gradient(45deg, rgba(0,0,0,0.05) 0 6px, rgba(0,0,0,0.1) 6px 12px);border:2px solid var(--ink);border-radius:4px;display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:0.7rem;}
   .wanted .photo svg{width:74%;height:74%;filter:drop-shadow(2px 4px 0 rgba(0,0,0,0.25));}
+  .wanted .photo img{width:100%;height:100%;object-fit:cover;object-position:center 22%;filter:sepia(0.45) contrast(1.06) saturate(0.85) brightness(0.96);display:block;}
+  .wanted .photo::before{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg, rgba(0,0,0,0.06) 0 1px, transparent 1px 3px);mix-blend-mode:multiply;}
+  .wanted .photo::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at center, transparent 55%, rgba(28,18,8,0.35) 100%);}
   .wanted .name{font-family:var(--pirate);font-size:2rem;text-align:center;letter-spacing:0.06em;line-height:1;margin:0.4rem 0 0.2rem;color:var(--ink);}
   .wanted .alias{text-align:center;font-family:var(--display);letter-spacing:0.32em;font-size:0.78rem;color:var(--blood);margin-bottom:0.55rem;}
   .wanted .bounty{display:flex;align-items:baseline;justify-content:center;gap:0.4rem;border-top:2px solid var(--ink);padding-top:0.5rem;margin-top:0.4rem;font-family:var(--display);font-weight:900;letter-spacing:0.04em;}
@@ -382,6 +398,7 @@
 
       <div class="cta-row">
         <a href="#experience" class="btn primary">Open Voyage Log <span class="arr">›</span></a>
+        <a href="resume.pdf" download class="btn secondary">Download Resume <span class="arr">⤓</span></a>
         <a href="#contact" class="btn secondary">Den Den Mushi <span class="arr">›</span></a>
       </div>
     </div>
@@ -426,7 +443,7 @@
     <div class="wanted">
       <div class="top">WANTED</div>
       <div class="photo">
-        <svg viewBox="0 0 100 100"><use href="#strawhat" x="14" y="-2" width="72" height="48"/><circle cx="50" cy="62" r="22" fill="#1a0f05"/><rect x="34" y="80" width="32" height="14" fill="#1a0f05"/></svg>
+        <img src="keerthan.jpg" alt="Keerthan Nekkanti at Carnegie Mellon University" loading="lazy" />
       </div>
       <div class="name">KEERTHAN</div>
       <div class="alias">"THE DATA NAVIGATOR"</div>
@@ -721,6 +738,13 @@
           <div>github.com/Keerthan28</div>
         </div>
         <span class="arr">›</span>
+      </a>
+      <a href="resume.pdf" download>
+        <div>
+          <div class="k">Resume · Bounty Scroll</div>
+          <div>Download PDF</div>
+        </div>
+        <span class="arr">⤓</span>
       </a>
       <a href="#about">
         <div>
