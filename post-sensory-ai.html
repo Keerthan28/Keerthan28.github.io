@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sensory Devices &amp; AI · Engineering Observation Haki · Keerthan Nekkanti</title>
+<link href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Cinzel:wght@500;700;900&family=IM+Fell+English:ital@0;1&family=Special+Elite&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#07090f;--bg-2:#0d1426;
+    --panel:rgba(20,16,10,0.86);--panel-2:rgba(36,28,16,0.78);
+    --parchment:#f4e1b6;--ink:#1a0f05;
+    --line:rgba(244,225,182,0.16);--line-strong:rgba(244,225,182,0.32);
+    --gold:#f5c542;--gold-deep:#c89b1f;--blood:#c42b1c;--blood-bright:#e53935;
+    --sea:#1976d2;--text:#f4e6c8;--muted:#b89968;
+    --pirate:'Pirata One',cursive;--display:'Cinzel',serif;
+    --body:'IM Fell English','Crimson Text',serif;
+    --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,monospace;
+  }
+  *{box-sizing:border-box;}html{scroll-behavior:smooth;}
+  body{margin:0;font-family:var(--body);color:var(--text);
+    background:
+      radial-gradient(1200px 600px at 80% -10%,rgba(196,43,28,0.18),transparent 60%),
+      radial-gradient(900px 500px at -10% 30%,rgba(25,118,210,0.12),transparent 55%),
+      linear-gradient(180deg,#06070d 0%,#0a1020 100%);
+    line-height:1.7;letter-spacing:0.01em;font-size:1.08rem;}
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    background-image:
+      repeating-linear-gradient(45deg,rgba(245,197,66,0.018) 0 2px,transparent 2px 4px),
+      repeating-linear-gradient(-45deg,rgba(244,225,182,0.012) 0 2px,transparent 2px 4px);
+    mix-blend-mode:screen;}
+  body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    background:repeating-linear-gradient(0deg,rgba(244,225,182,0.025) 0 1px,transparent 1px 3px);
+    opacity:0.3;mix-blend-mode:overlay;}
+  nav{position:sticky;top:0;backdrop-filter:blur(18px);background:rgba(7,9,15,0.84);z-index:50;border-bottom:1px solid var(--line);}
+  nav .nav-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:0.85rem 1.5rem;}
+  .brand{font-family:var(--display);font-weight:900;font-size:0.95rem;letter-spacing:0.22em;color:var(--parchment);}
+  .brand a{color:inherit;text-decoration:none;}
+  nav .back{font-family:var(--mono);font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);text-decoration:none;border:1px solid rgba(245,197,66,0.5);padding:0.45rem 0.95rem;border-radius:3px;}
+  nav .back:hover{background:rgba(245,197,66,0.08);}
+  article{max-width:760px;margin:0 auto;padding:4rem 1.5rem 6rem;position:relative;z-index:2;}
+  .stencil{font-family:var(--mono);font-size:0.7rem;letter-spacing:0.32em;text-transform:uppercase;color:var(--gold);margin-bottom:1.2rem;display:flex;align-items:center;gap:0.8rem;}
+  .stencil::before,.stencil::after{content:"";flex:0 0 38px;height:1px;background:var(--gold);opacity:0.6;}
+  .stencil::after{flex:1;}
+  h1{font-family:var(--pirate);font-weight:400;font-size:clamp(2.4rem,4.6vw,4rem);line-height:1.05;margin:0 0 0.6rem;color:var(--parchment);text-shadow:2px 2px 0 #000,4px 4px 0 rgba(196,43,28,0.45);letter-spacing:0.02em;}
+  .lede{font-family:var(--body);font-style:italic;color:var(--gold);font-size:1.2rem;border-left:3px solid var(--blood);padding-left:1rem;margin:1.6rem 0 2.5rem;}
+  .meta{font-family:var(--mono);font-size:0.7rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--muted);margin-bottom:0.5rem;}
+  .meta b{color:var(--gold);}
+  h2{font-family:var(--display);font-weight:700;font-size:1.55rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--parchment);margin-top:3rem;margin-bottom:0.8rem;border-bottom:1px dashed var(--line-strong);padding-bottom:0.4rem;}
+  h3{font-family:var(--display);font-weight:600;font-size:1.2rem;color:var(--gold);margin-top:1.8rem;margin-bottom:0.4rem;}
+  p{margin:0.8rem 0;color:#dccfae;}
+  blockquote{border-left:3px solid var(--gold);padding:0.6rem 1.1rem;margin:1.2rem 0;font-style:italic;background:rgba(245,197,66,0.05);color:var(--parchment);}
+  ul,ol{padding-left:1.4rem;}
+  li{margin:0.4rem 0;color:#dccfae;}
+  li::marker{color:var(--blood);}
+  b,strong{color:var(--gold);}
+  code{font-family:var(--mono);font-size:0.92em;color:var(--gold);background:rgba(245,197,66,0.08);padding:0.1rem 0.4rem;border-radius:3px;}
+  .haki{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0.8rem;margin:1.8rem 0;}
+  .haki div{padding:0.95rem 1rem;border:1px solid var(--line);border-radius:4px;background:var(--panel);}
+  .haki .h{font-family:var(--display);font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:0.06em;font-size:0.85rem;margin-bottom:0.3rem;}
+  .haki .d{font-family:var(--mono);font-size:0.72rem;color:var(--muted);letter-spacing:0.05em;}
+  hr{border:none;border-top:1px dashed var(--line-strong);margin:2.5rem 0;}
+  footer{max-width:760px;margin:0 auto;padding:0 1.5rem 4rem;color:var(--muted);font-family:var(--mono);font-size:0.72rem;letter-spacing:0.22em;text-transform:uppercase;}
+  footer .sig{color:var(--gold);}
+  .next{display:flex;justify-content:space-between;align-items:center;gap:1rem;margin-top:2rem;padding:1rem 1.2rem;border:1px solid var(--line);border-radius:4px;background:var(--panel);font-family:var(--mono);font-size:0.78rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--parchment);text-decoration:none;}
+  .next:hover{border-color:var(--gold);background:rgba(245,197,66,0.05);}
+  .next .arr{color:var(--gold);}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="brand"><a href="index.html">⚓ KEERTHAN · NEKKANTI</a></div>
+    <a class="back" href="index.html#blog">‹ Back to Den Den Mushi</a>
+  </div>
+</nav>
+
+<article>
+  <div class="stencil">Den Den Mushi · Lap 02 · 2026</div>
+  <h1>Sensory Devices &amp; AI</h1>
+  <div class="meta"><b>ENGINEERING OBSERVATION HAKI</b> · 11 MIN READ · KEERTHAN NEKKANTI</div>
+  <p class="lede">In One Piece, the strongest fighters do not see with their eyes alone. Observation Haki — Kenbunshoku — lets them feel a presence around a corner, dodge a bullet by reading intent, and predict the next swing of a sword. Modern AI, paired with sensors, is quietly trying to grow the same sense.</p>
+
+  <h2>The three Hakis, mapped to AI</h2>
+  <p>Once you start looking, the parallel between Haki and modern AI systems becomes uncannily clean:</p>
+  <div class="haki">
+    <div><div class="h">Observation · Kenbunshoku</div><div class="d">Sensing the world — multimodal perception, IoT, anomaly detection</div></div>
+    <div><div class="h">Armament · Busoshoku</div><div class="d">Acting on the world — actuators, robotics, agentic execution</div></div>
+    <div><div class="h">Conqueror · Haoshoku</div><div class="d">Coordinating systems — orchestration, swarm intelligence, market-shaping models</div></div>
+  </div>
+  <p>This essay is mostly about the first one — the sensory layer — because that's where the next decade of useful AI is going to be born.</p>
+
+  <h2>Why sensors are eating AI</h2>
+  <p>The big language models you've heard of were trained on the largest written record in human history. That well isn't bottomless. The next 10x of training data is not <em>more text</em> — it's the world itself, captured in sensors. Cameras, microphones, radar, lidar, thermal, IMUs, biosignals, satellite spectra, soil moisture probes, kitchen scales.</p>
+  <p>Three forces are bending compute toward the sensor edge:</p>
+  <ol>
+    <li><b>Cheap silicon.</b> A $3 microcontroller now fits a tiny neural net for keyword spotting, fall detection, or arrhythmia classification.</li>
+    <li><b>Foundation models for perception.</b> CLIP-style and segment-anything-style models give us reusable "eyes" that no single team has to retrain from scratch.</li>
+    <li><b>Energy ceilings.</b> You cannot send every camera frame to a hyperscale GPU. The world will run on tiered intelligence: fast, dumb sensing locally; slow, smart reasoning in the cloud.</li>
+  </ol>
+
+  <h2>Five places where sensors + AI are already changing the rules</h2>
+
+  <h3>1. Healthcare on the wrist</h3>
+  <p>A modern smartwatch is a six-sensor device pretending to be a watch. Optical heart rate, ECG, SpO₂, accelerometer, temperature, and now glucose-trend estimators. Pair these with on-device models and you get arrhythmia alerts, sleep staging, and early-warning systems for conditions that used to require a full clinic visit.</p>
+
+  <h3>2. Cars learning to feel</h3>
+  <p>Self-driving systems are essentially a giant exercise in fusing bad sensors into one good belief. Cameras lie when sun-blinded, lidar lies in snow, radar lies on flat metal. The interesting research isn't "which sensor wins" — it's how to <b>fuse contradictory streams</b> into a single trustworthy world model. That fusion problem is general.</p>
+
+  <h3>3. Industrial and environmental telemetry</h3>
+  <p>Bridges, dams, transformers, pipelines, soil — there are millions of expensive things in the world that fail without warning, and that we now wrap in cheap sensors. The challenge is no longer collecting data, it's separating <b>signal from noise at scale</b> and acting on it before failure. This is straight out of my BofA playbook: 100M+ records, real-time pipelines, anomaly detection.</p>
+
+  <h3>4. Multimodal personal AI</h3>
+  <p>The interesting frontier is not the chat box — it's the assistant that sees what you see. AR glasses, in-ear models, ambient room mics. The privacy questions here are gigantic and the engineering is harder than people think. Latency, on-device compute, and edge-to-cloud handoff are the new bottlenecks.</p>
+
+  <h3>5. Security at the edge</h3>
+  <p>This is where my IEEE work on lightweight ciphers comes back. When sensors are tiny and power-starved, you cannot run the heavyweight crypto your laptop uses. You need ciphers like <b>SIT, LEA, Twine, and PRESENT</b> that produce real security at single-watt budgets. Without that, the entire sensory AI stack is one packet capture away from being weaponized against the people it serves.</p>
+
+  <blockquote>An AI without sensors is a sage in a sealed library. An AI with sensors is Zoro the moment Mihawk finally teaches him to <em>listen</em>. Same brain, different sea.</blockquote>
+
+  <h2>The hard problems nobody talks enough about</h2>
+  <ul>
+    <li><b>Sensor calibration drift.</b> A model trained on Sensor Generation N quietly degrades when the manufacturer ships Generation N+1. Continual learning at scale is mostly an unsolved engineering discipline.</li>
+    <li><b>Multimodal alignment is harder than multimodal demos.</b> A model that can <em>name</em> what it sees is not the same as a model that can <em>act</em> on what it sees with the right priorities.</li>
+    <li><b>Privacy isn't a feature; it's an architecture.</b> If sensitive sensor data ever leaves the device unencrypted, the system is already broken. End-to-end encryption, federated learning, and on-device inference are no longer optional.</li>
+    <li><b>Energy budgets are the new latency budgets.</b> Whoever wins the next decade of edge AI will be the team that does the most useful inference per watt-hour, not per millisecond.</li>
+  </ul>
+
+  <h2>What I'm building toward</h2>
+  <p>Two convictions are guiding what I work on next:</p>
+  <ul>
+    <li><b>The most useful AI is multimodal, on-device, and cheap.</b> The future is a thousand small models living inside the things that already touch the world, coordinated by a smaller number of cloud captains.</li>
+    <li><b>Security is the spine of sensory AI.</b> Without it, the sensors become the attack surface. The work I started on lightweight ciphers and the controls I built into compliance pipelines at BofA both point at the same lesson: you must design for adversaries from line one.</li>
+  </ul>
+
+  <p>Observation Haki, in the end, is not magic. It's training. It's pattern recognition built from a lifetime of noticing the small things. AI plus sensors is doing the same thing — building a generation of systems that notice what we don't, fast enough to matter.</p>
+
+  <hr>
+
+  <p>The Den Den Mushi snail listens too. Pick up.</p>
+
+  <a class="next" href="post-agentic-ai.html">Next Transmission · From Bank Vaults to Agentic Crews <span class="arr">›</span></a>
+</article>
+
+<footer>
+  © 2026 · Keerthan Nekkanti · <span class="sig">KN-28 · Captain of the Data Pirates</span>
+</footer>
+
+</body>
+</html>

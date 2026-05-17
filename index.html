@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Keerthan Nekkanti · Captain's Log · Software · AI · Analytics</title>
+<link href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Cinzel:wght@500;700;900&family=IM+Fell+English:ital@0;1&family=Special+Elite&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+  :root {
+    --bg: #07090f;
+    --bg-2: #0d1426;
+    --ocean: #0e2c54;
+    --ocean-2: #133b6e;
+    --panel: rgba(20, 16, 10, 0.86);
+    --panel-2: rgba(36, 28, 16, 0.78);
+    --parchment: #f4e1b6;
+    --parchment-2: #e6cf8e;
+    --parchment-shade: #c9a96a;
+    --parchment-deep: #8b6f3f;
+    --ink: #1a0f05;
+    --ink-2: #2a1c0d;
+    --line: rgba(244, 225, 182, 0.16);
+    --line-strong: rgba(244, 225, 182, 0.32);
+    --gold: #f5c542;
+    --gold-deep: #c89b1f;
+    --blood: #c42b1c;
+    --blood-bright: #e53935;
+    --sea: #1976d2;
+    --sea-deep: #0d3a66;
+    --kraken: #6a3b8c;
+    --green-marine: #2e7d32;
+    --text: #f4e6c8;
+    --muted: #b89968;
+    --pirate: 'Pirata One', cursive;
+    --display: 'Cinzel', serif;
+    --body: 'IM Fell English', 'Crimson Text', serif;
+    --typewriter: 'Special Elite', cursive;
+    --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    font-family:var(--body);
+    color:var(--text);
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(196,43,28,0.18), transparent 60%),
+      radial-gradient(900px 500px at -10% 30%, rgba(25,118,210,0.12), transparent 55%),
+      radial-gradient(800px 800px at 50% 120%, rgba(245,197,66,0.08), transparent 60%),
+      linear-gradient(180deg, #06070d 0%, #0a1020 100%);
+    line-height:1.6;
+    overflow-x:hidden;
+    letter-spacing:0.01em;
+  }
+  /* aged paper noise */
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    background-image:
+      repeating-linear-gradient(45deg, rgba(245,197,66,0.018) 0 2px, transparent 2px 4px),
+      repeating-linear-gradient(-45deg, rgba(244,225,182,0.012) 0 2px, transparent 2px 4px);
+    mix-blend-mode:screen;
+  }
+  body::after{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    background:repeating-linear-gradient(0deg, rgba(244,225,182,0.025) 0 1px, transparent 1px 3px);
+    opacity:0.3;mix-blend-mode:overlay;
+  }
+  .grid-bg{
+    position:fixed;inset:0;z-index:0;pointer-events:none;
+    background-image:
+      linear-gradient(rgba(245,197,66,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(245,197,66,0.04) 1px, transparent 1px);
+    background-size:80px 80px;
+    mask-image:radial-gradient(circle at 50% 40%, black 30%, transparent 80%);
+    -webkit-mask-image:radial-gradient(circle at 50% 40%, black 30%, transparent 80%);
+  }
+  /* horizon waves */
+  .waves{
+    position:fixed;left:0;right:0;bottom:0;height:160px;z-index:0;pointer-events:none;
+    background:
+      radial-gradient(120% 80px at 50% 100%, rgba(25,118,210,0.45), transparent 70%),
+      linear-gradient(180deg, transparent, rgba(13,58,102,0.45));
+    -webkit-mask-image:linear-gradient(180deg, transparent, black 60%);
+            mask-image:linear-gradient(180deg, transparent, black 60%);
+  }
+  .progress{
+    position:fixed;top:0;left:0;height:3px;
+    background:linear-gradient(90deg, var(--blood), var(--gold), var(--sea));
+    width:0%;z-index:100;box-shadow:0 0 12px var(--gold);
+  }
+  .hud{
+    position:fixed;top:14px;left:14px;right:14px;z-index:90;
+    display:flex;justify-content:space-between;
+    font-family:var(--mono);font-size:0.7rem;text-transform:uppercase;
+    color:var(--muted);letter-spacing:0.18em;pointer-events:none;
+  }
+  .hud .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--blood);margin-right:8px;box-shadow:0 0 10px var(--blood);animation:blink 1.2s infinite;}
+  @keyframes blink{50%{opacity:0.3;}}
+  .cursor{
+    position:fixed;width:30px;height:30px;
+    border:1px solid rgba(245,197,66,0.7);border-radius:50%;
+    pointer-events:none;transform:translate(-50%,-50%);z-index:99;
+    mix-blend-mode:difference;transition:width 0.2s,height 0.2s,border-color 0.2s;
+  }
+  .cursor::before,.cursor::after{content:"";position:absolute;background:var(--gold);}
+  .cursor::before{left:50%;top:-7px;width:1px;height:14px;transform:translateX(-50%);}
+  .cursor::after{top:50%;left:-7px;height:1px;width:14px;transform:translateY(-50%);}
+  /* nav */
+  nav{position:sticky;top:0;backdrop-filter:blur(18px);background:rgba(7,9,15,0.84);z-index:50;border-bottom:1px solid var(--line);}
+  nav .nav-inner{max-width:1280px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:0.75rem 1.5rem;}
+  .brand{font-family:var(--display);font-weight:900;font-size:1rem;letter-spacing:0.22em;display:flex;align-items:center;gap:0.65rem;color:var(--parchment);}
+  .brand .roger{
+    width:34px;height:34px;border-radius:50%;
+    background:radial-gradient(circle at 35% 35%, #fff, #e9e5d8 60%, #b9a675 100%);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 0 18px rgba(245,197,66,0.45),inset 0 0 0 2px #1a0f05;
+  }
+  nav ul{display:flex;list-style:none;margin:0;padding:0;gap:1.6rem;}
+  nav a{color:var(--muted);text-decoration:none;font-family:var(--mono);font-size:0.75rem;text-transform:uppercase;letter-spacing:0.16em;position:relative;padding:0.4rem 0;}
+  nav a::before{content:"⚓ ";color:var(--gold);opacity:0.7;}
+  nav a:hover{color:var(--text);}
+  nav a::after{content:"";position:absolute;left:0;bottom:-2px;width:0;height:2px;background:var(--gold);transition:width 0.35s ease;}
+  nav a:hover::after{width:100%;}
+  /* HERO */
+  header.hero{position:relative;min-height:100vh;padding:5rem 1.5rem 4rem;display:flex;align-items:center;overflow:hidden;}
+  .hero-grid{position:relative;max-width:1280px;margin:0 auto;display:grid;grid-template-columns:1.1fr 1fr;gap:3rem;align-items:center;width:100%;z-index:2;}
+  .stencil{font-family:var(--mono);font-size:0.72rem;letter-spacing:0.32em;text-transform:uppercase;color:var(--gold);margin-bottom:1.2rem;display:flex;align-items:center;gap:0.8rem;}
+  .stencil::before,.stencil::after{content:"";flex:0 0 38px;height:1px;background:var(--gold);opacity:0.6;}
+  .stencil::after{flex:1;}
+  .hero h1{font-family:var(--pirate);font-weight:400;font-size:clamp(3.2rem,7.5vw,6rem);line-height:0.95;margin:0 0 1rem;letter-spacing:0.02em;}
+  .hero h1 .first{display:block;color:var(--parchment);text-shadow:2px 2px 0 #000, 4px 4px 0 rgba(196,43,28,0.45);}
+  .hero h1 .last{display:block;background:linear-gradient(180deg,#fff 0%,var(--parchment) 50%,var(--gold) 75%,var(--gold-deep) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-shadow:none;}
+  .bounty-num{position:absolute;top:4rem;right:1.5rem;font-family:var(--display);font-weight:900;font-size:clamp(7rem,18vw,18rem);line-height:0.8;color:transparent;-webkit-text-stroke:2px rgba(245,197,66,0.18);pointer-events:none;user-select:none;z-index:1;letter-spacing:-0.04em;}
+  .typing{font-family:var(--typewriter);font-size:1.05rem;color:var(--parchment);min-height:1.6em;margin-top:0.5rem;letter-spacing:0.04em;}
+  .typing::before{content:"⚓ ";color:var(--blood);}
+  .caret{display:inline-block;width:8px;height:1em;background:var(--gold);vertical-align:-2px;margin-left:2px;animation:caret 1s steps(2) infinite;}
+  @keyframes caret{50%{opacity:0;}}
+  .cta-row{margin-top:2rem;display:flex;flex-wrap:wrap;gap:0.9rem;}
+  .btn{display:inline-flex;align-items:center;gap:0.6rem;padding:0.95rem 1.7rem;border-radius:4px;text-decoration:none;font-family:var(--mono);font-size:0.78rem;letter-spacing:0.18em;text-transform:uppercase;font-weight:700;transition:all 0.25s ease;clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px);}
+  .btn.primary{background:var(--blood);color:#fff;box-shadow:0 8px 28px rgba(196,43,28,0.45),inset 0 0 0 1px rgba(245,197,66,0.35);}
+  .btn.primary:hover{background:var(--blood-bright);transform:translateY(-2px);}
+  .btn.secondary{background:transparent;color:var(--parchment);box-shadow:inset 0 0 0 1px var(--line-strong);}
+  .btn.secondary:hover{background:rgba(245,197,66,0.06);box-shadow:inset 0 0 0 1px var(--gold);}
+  .btn .arr{transition:transform 0.25s;}
+  .btn:hover .arr{transform:translateX(4px);}
+  /* THREE wrap */
+  .three-wrap{position:relative;width:100%;aspect-ratio:1/1;border-radius:6px;overflow:hidden;background:radial-gradient(circle at 50% 60%,rgba(25,118,210,0.35),transparent 60%),linear-gradient(180deg,#0a1226,#06070f);box-shadow:0 35px 90px rgba(0,0,0,0.6),inset 0 0 0 1px var(--line);}
+  .three-wrap canvas{display:block;width:100% !important;height:100% !important;}
+  .three-wrap .corner{position:absolute;width:22px;height:22px;border:2px solid var(--gold);}
+  .three-wrap .corner.tl{top:10px;left:10px;border-right:0;border-bottom:0;}
+  .three-wrap .corner.tr{top:10px;right:10px;border-left:0;border-bottom:0;}
+  .three-wrap .corner.bl{bottom:10px;left:10px;border-right:0;border-top:0;}
+  .three-wrap .corner.br{bottom:10px;right:10px;border-left:0;border-top:0;}
+  .three-wrap .label{position:absolute;bottom:14px;left:16px;font-family:var(--mono);font-size:0.65rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--muted);}
+  .three-wrap .label b{color:var(--gold);}
+  /* telemetry strip → BOUNTY STATS */
+  .bounty{max-width:1280px;margin:-1rem auto 0;padding:0 1.5rem 3rem;display:grid;grid-template-columns:repeat(6,1fr);gap:0.75rem;position:relative;z-index:3;}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:0.95rem 1rem;backdrop-filter:blur(14px);position:relative;overflow:hidden;}
+  .stat::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--blood);}
+  .stat .k{font-family:var(--mono);font-size:0.6rem;letter-spacing:0.22em;color:var(--muted);text-transform:uppercase;}
+  .stat .v{font-family:var(--display);font-weight:700;font-size:1.4rem;margin-top:0.2rem;color:var(--parchment);}
+  .stat .u{font-family:var(--mono);font-size:0.65rem;color:var(--muted);}
+  .stat.gold::before{background:var(--gold);}
+  .stat.sea::before{background:var(--sea);}
+  .stat.kraken::before{background:var(--kraken);}
+  .stat.green::before{background:var(--green-marine);}
+  /* sections */
+  section{max-width:1280px;margin:0 auto;padding:5rem 1.5rem;position:relative;z-index:2;opacity:0;transform:translateY(40px);transition:opacity 0.8s ease,transform 0.8s ease;}
+  section.visible{opacity:1;transform:translateY(0);}
+  .section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px dashed var(--line-strong);}
+  .section-head .file-id{font-family:var(--mono);font-size:0.7rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--muted);}
+  .section-head .file-id b{color:var(--gold);}
+  .section-head h2{font-family:var(--pirate);font-weight:400;font-size:clamp(2rem,4vw,3rem);margin:0.35rem 0 0;letter-spacing:0.04em;color:var(--parchment);text-shadow:2px 2px 0 #000;}
+  .section-head .meta{font-family:var(--mono);font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.2em;}
+  .section-head .meta .ok{color:var(--gold);}
+  /* dossier card */
+  .dossier{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:1.8rem;backdrop-filter:blur(16px);position:relative;transition:transform 0.4s ease,box-shadow 0.4s ease,border-color 0.4s ease;}
+  .dossier:hover{transform:translateY(-4px);border-color:rgba(245,197,66,0.55);box-shadow:0 30px 60px rgba(0,0,0,0.6),0 0 0 1px rgba(245,197,66,0.3);}
+  .dossier .tag{position:absolute;top:-10px;left:18px;background:var(--bg);padding:0 0.55rem;font-family:var(--mono);font-size:0.62rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(245,197,66,0.6);border-radius:3px;}
+  .dossier h3{font-family:var(--display);font-weight:700;font-size:1.2rem;margin:0 0 0.4rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--parchment);}
+  .dossier .sub{font-family:var(--mono);font-size:0.72rem;color:var(--muted);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:1rem;}
+  .dossier p{margin:0.5rem 0;color:#dccfae;font-size:1.02rem;font-family:var(--body);}
+  .dossier ul{padding-left:1.1rem;margin:0.4rem 0;}
+  .dossier ul li{margin:0.3rem 0;color:#dccfae;}
+  .dossier ul li::marker{color:var(--blood);}
+  .dossier b{color:var(--gold);}
+  .stamp{position:absolute;top:1rem;right:1rem;font-family:var(--display);font-weight:900;font-size:0.7rem;letter-spacing:0.3em;color:rgba(196,43,28,0.9);border:2px solid rgba(196,43,28,0.9);padding:0.25rem 0.6rem;transform:rotate(-8deg);text-transform:uppercase;opacity:0.9;}
+  /* WANTED about grid */
+  .about-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:1.25rem;}
+  .driver-card{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:1.4rem;display:grid;grid-template-columns:1fr 1fr;gap:0.6rem 1.4rem;font-family:var(--mono);font-size:0.8rem;}
+  .driver-card .row{display:flex;justify-content:space-between;padding:0.45rem 0;border-bottom:1px dotted rgba(244,225,182,0.1);}
+  .driver-card .row .k{color:var(--muted);text-transform:uppercase;letter-spacing:0.16em;font-size:0.68rem;}
+  .driver-card .row .v{color:var(--parchment);font-weight:700;}
+  .driver-card .row .v.gold{color:var(--gold);}
+  /* Wanted poster */
+  .wanted{
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(245,197,66,0.12), transparent 60%),
+      repeating-linear-gradient(0deg, rgba(0,0,0,0.04) 0 2px, transparent 2px 4px),
+      linear-gradient(180deg,#f0d9a8 0%,#dabd7a 50%,#c19f5a 100%);
+    color:var(--ink);
+    border:2px solid var(--ink);
+    border-radius:6px;
+    padding:1.6rem 1.4rem 1.4rem;
+    position:relative;
+    overflow:hidden;
+    box-shadow:0 30px 80px rgba(0,0,0,0.6),inset 0 0 0 1px rgba(0,0,0,0.25),inset 0 0 60px rgba(0,0,0,0.18);
+    font-family:var(--body);
+  }
+  .wanted::before,.wanted::after{content:"";position:absolute;width:34px;height:34px;border:2px solid var(--ink);border-radius:50%;}
+  .wanted::before{top:8px;left:8px;}
+  .wanted::after{bottom:8px;right:8px;}
+  .wanted .top{font-family:var(--pirate);font-size:3.5rem;text-align:center;letter-spacing:0.18em;color:var(--ink);margin:0 0 0.2rem;line-height:1;text-shadow:2px 2px 0 rgba(196,43,28,0.5);}
+  .wanted .dor{font-family:var(--display);font-weight:900;text-align:center;letter-spacing:0.42em;font-size:0.78rem;margin-bottom:0.6rem;color:var(--ink-2);}
+  .wanted .photo{aspect-ratio:1.05/1;background:repeating-linear-gradient(45deg, rgba(0,0,0,0.05) 0 6px, rgba(0,0,0,0.1) 6px 12px);border:2px solid var(--ink);border-radius:4px;display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:0.7rem;}
+  .wanted .photo svg{width:74%;height:74%;filter:drop-shadow(2px 4px 0 rgba(0,0,0,0.25));}
+  .wanted .name{font-family:var(--pirate);font-size:2rem;text-align:center;letter-spacing:0.06em;line-height:1;margin:0.4rem 0 0.2rem;color:var(--ink);}
+  .wanted .alias{text-align:center;font-family:var(--display);letter-spacing:0.32em;font-size:0.78rem;color:var(--blood);margin-bottom:0.55rem;}
+  .wanted .bounty{display:flex;align-items:baseline;justify-content:center;gap:0.4rem;border-top:2px solid var(--ink);padding-top:0.5rem;margin-top:0.4rem;font-family:var(--display);font-weight:900;letter-spacing:0.04em;}
+  .wanted .bounty .sym{font-size:1.4rem;}
+  .wanted .bounty .amt{font-size:1.7rem;}
+  .wanted .marine{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:0.55rem;letter-spacing:0.36em;color:var(--ink-2);}
+  /* timeline */
+  .timeline{position:relative;display:grid;gap:1.25rem;padding-left:1.6rem;}
+  .timeline::before{content:"";position:absolute;left:0.55rem;top:0;bottom:0;width:2px;background:linear-gradient(180deg,var(--gold),transparent);}
+  .timeline .dossier::before{content:"";position:absolute;left:-1.4rem;top:1.6rem;width:14px;height:14px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 4px rgba(245,197,66,0.18),0 0 14px var(--gold);}
+  /* Treasury / projects */
+  .garage{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.25rem;}
+  .machine{background:linear-gradient(180deg,var(--panel) 0%,rgba(36,28,16,0.5) 100%);border:1px solid var(--line);border-radius:6px;padding:1.6rem;position:relative;overflow:hidden;transition:transform 0.4s ease,border-color 0.4s ease;}
+  .machine::after{content:"";position:absolute;right:-30px;top:-30px;width:140px;height:140px;background:repeating-conic-gradient(rgba(245,197,66,0.18) 0% 25%,transparent 0% 50%);opacity:0.18;border-radius:50%;}
+  .machine:hover{transform:translateY(-6px);border-color:rgba(245,197,66,0.55);}
+  .machine .badge{display:inline-block;font-family:var(--mono);font-size:0.65rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(245,197,66,0.5);padding:0.22rem 0.6rem;border-radius:3px;margin-bottom:0.9rem;}
+  .machine h3{font-family:var(--display);margin:0.2rem 0 0.4rem;text-transform:uppercase;letter-spacing:0.04em;font-size:1.1rem;color:var(--parchment);}
+  .machine p{color:#dccfae;font-family:var(--body);font-size:1rem;}
+  .machine .specs{display:grid;grid-template-columns:1fr 1fr;gap:0.3rem 1rem;margin-top:1rem;font-family:var(--mono);font-size:0.72rem;}
+  .machine .specs span{color:var(--muted);text-transform:uppercase;letter-spacing:0.14em;}
+  .machine .specs b{color:var(--parchment);}
+  /* radio (blog) */
+  .radio{display:grid;gap:1rem;}
+  .msg{display:grid;grid-template-columns:auto 1fr auto;gap:1rem;align-items:center;padding:1.1rem 1.3rem;background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:4px;text-decoration:none;color:inherit;transition:transform 0.3s ease,background 0.3s ease;}
+  .msg:hover{transform:translateX(6px);background:rgba(245,197,66,0.06);border-left-color:var(--blood);}
+  .msg .time{font-family:var(--mono);font-size:0.7rem;color:var(--muted);letter-spacing:0.14em;}
+  .msg .title{font-family:var(--display);text-transform:uppercase;font-size:1.05rem;letter-spacing:0.04em;color:var(--parchment);}
+  .msg .sub{font-family:var(--mono);font-size:0.72rem;color:var(--muted);letter-spacing:0.1em;}
+  .msg .pill{font-family:var(--mono);font-size:0.65rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(245,197,66,0.5);padding:0.25rem 0.6rem;border-radius:3px;}
+  .denden{width:46px;height:46px;flex-shrink:0;}
+  /* skills / haki */
+  .setup{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;}
+  .gauge{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:1.2rem 1.3rem;}
+  .gauge .name{display:flex;justify-content:space-between;font-family:var(--mono);font-size:0.75rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:0.5rem;}
+  .gauge .name b{color:var(--parchment);}
+  .gauge .bar{position:relative;height:8px;background:rgba(244,225,182,0.08);border-radius:999px;overflow:hidden;}
+  .gauge .fill{position:absolute;top:0;left:0;bottom:0;background:linear-gradient(90deg,var(--blood),var(--gold));box-shadow:0 0 12px rgba(196,43,28,0.5);width:0;transition:width 1.4s cubic-bezier(0.2,0.8,0.2,1);}
+  .gauge.sea .fill{background:linear-gradient(90deg,var(--sea),#80d8ff);box-shadow:0 0 12px rgba(25,118,210,0.4);}
+  .gauge.gold .fill{background:linear-gradient(90deg,var(--gold-deep),var(--gold));box-shadow:0 0 12px rgba(245,197,66,0.5);}
+  .gauge.kraken .fill{background:linear-gradient(90deg,var(--kraken),#ce93d8);box-shadow:0 0 12px rgba(106,59,140,0.5);}
+  .stack{display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:1rem;}
+  .chip{font-family:var(--mono);font-size:0.7rem;letter-spacing:0.14em;text-transform:uppercase;padding:0.4rem 0.78rem;border:1px solid var(--line-strong);border-radius:4px;color:var(--parchment);background:rgba(244,225,182,0.02);transition:all 0.2s;}
+  .chip:hover{border-color:var(--gold);color:var(--gold);transform:translateY(-1px);}
+  /* Devil fruit grid */
+  .fruits{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:0.9rem;margin-top:1.4rem;}
+  .fruit{display:flex;align-items:center;gap:0.7rem;padding:0.7rem 0.9rem;border:1px solid var(--line);border-radius:6px;background:var(--panel-2);}
+  .fruit svg{width:38px;height:38px;flex-shrink:0;}
+  .fruit .ft{font-family:var(--display);font-weight:700;font-size:0.82rem;color:var(--parchment);text-transform:uppercase;letter-spacing:0.06em;}
+  .fruit .fs{font-family:var(--mono);font-size:0.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.14em;}
+  /* contact / pit lane */
+  .pit{display:grid;grid-template-columns:1.1fr 1fr;gap:1.25rem;}
+  .pit .channel{display:flex;flex-direction:column;gap:0.9rem;}
+  .pit .channel a{display:flex;align-items:center;justify-content:space-between;padding:1.1rem 1.3rem;background:var(--panel);border:1px solid var(--line);border-radius:4px;text-decoration:none;color:inherit;font-family:var(--mono);font-size:0.85rem;letter-spacing:0.08em;transition:all 0.25s ease;}
+  .pit .channel a:hover{border-color:var(--gold);background:rgba(245,197,66,0.05);}
+  .pit .channel a .arr{color:var(--gold);}
+  .pit .channel a .k{color:var(--muted);text-transform:uppercase;letter-spacing:0.18em;font-size:0.7rem;}
+  .checkered{height:16px;background:repeating-linear-gradient(90deg, var(--ink) 0 16px, var(--gold) 16px 32px);opacity:0.85;}
+  footer{text-align:center;padding:3rem 1.5rem 4rem;color:var(--muted);font-family:var(--mono);font-size:0.72rem;letter-spacing:0.25em;text-transform:uppercase;position:relative;z-index:2;}
+  footer .sig{color:var(--gold);}
+  @media (max-width:1000px){
+    .hero-grid{grid-template-columns:1fr;}
+    .about-grid,.pit{grid-template-columns:1fr;}
+    .bounty{grid-template-columns:repeat(3,1fr);}
+    nav ul{gap:0.9rem;flex-wrap:wrap;justify-content:flex-end;}
+    .bounty-num{display:none;}
+  }
+  @media (max-width:600px){
+    .bounty{grid-template-columns:repeat(2,1fr);}
+    .driver-card{grid-template-columns:1fr;}
+    nav .nav-inner{flex-direction:column;gap:0.6rem;align-items:flex-start;}
+  }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="jolly" viewBox="0 0 64 64">
+      <g fill="#1a0f05" stroke="#1a0f05" stroke-width="1.2">
+        <path d="M32 6c-12 0-22 8-22 19 0 8 5 13 9 16v6c0 1 1 2 2 2h22c1 0 2-1 2-2v-6c4-3 9-8 9-16 0-11-10-19-22-19z"/>
+        <circle cx="22" cy="27" r="5" fill="#fff7e1"/>
+        <circle cx="42" cy="27" r="5" fill="#fff7e1"/>
+        <circle cx="22" cy="27" r="2" fill="#1a0f05"/>
+        <circle cx="42" cy="27" r="2" fill="#1a0f05"/>
+        <path d="M28 38h8v3h-8z" fill="#1a0f05"/>
+        <path d="M26 41h2v3h-2zM30 41h2v3h-2zM34 41h2v3h-2zM38 41h2v3h-2z" fill="#1a0f05"/>
+      </g>
+      <g stroke="#1a0f05" stroke-width="3" stroke-linecap="round">
+        <path d="M8 50l48-30"/>
+        <path d="M56 50L8 20"/>
+      </g>
+      <path d="M30 12l2 4 2-4-2-2z" fill="#c42b1c"/>
+    </symbol>
+    <symbol id="strawhat" viewBox="0 0 64 64">
+      <ellipse cx="32" cy="42" rx="28" ry="6" fill="#f5d57a" stroke="#1a0f05" stroke-width="1.5"/>
+      <path d="M14 40c0-12 8-22 18-22s18 10 18 22" fill="#f5d57a" stroke="#1a0f05" stroke-width="1.5"/>
+      <rect x="14" y="38" width="36" height="5" fill="#c42b1c" stroke="#1a0f05" stroke-width="1.2"/>
+    </symbol>
+    <symbol id="compass" viewBox="0 0 64 64">
+      <circle cx="32" cy="32" r="28" fill="none" stroke="#f5c542" stroke-width="2"/>
+      <circle cx="32" cy="32" r="22" fill="none" stroke="#f5c542" stroke-width="1" opacity="0.6"/>
+      <polygon points="32,8 36,32 32,56 28,32" fill="#c42b1c" stroke="#1a0f05" stroke-width="1"/>
+      <polygon points="8,32 32,28 56,32 32,36" fill="#f5c542" stroke="#1a0f05" stroke-width="1"/>
+      <circle cx="32" cy="32" r="3" fill="#1a0f05"/>
+    </symbol>
+    <symbol id="fruit" viewBox="0 0 64 64">
+      <path d="M22 12c4-2 8-2 10 0 2-2 6-2 10 0" fill="none" stroke="#2e7d32" stroke-width="2" stroke-linecap="round"/>
+      <ellipse cx="32" cy="38" rx="20" ry="22" fill="#c42b1c"/>
+      <path d="M14 30c4 6 14 8 18 0 4-6 14-6 18 0" fill="none" stroke="#1a0f05" stroke-width="1.5" opacity="0.6"/>
+      <path d="M14 42c4-6 14-8 18 0 4 6 14 6 18 0" fill="none" stroke="#1a0f05" stroke-width="1.5" opacity="0.5"/>
+      <path d="M22 14c-2 0-3 2-2 4" fill="none" stroke="#2e7d32" stroke-width="2" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="dendenmushi" viewBox="0 0 64 64">
+      <ellipse cx="34" cy="46" rx="22" ry="8" fill="#2e7d32" stroke="#1a0f05" stroke-width="1.5"/>
+      <circle cx="32" cy="32" r="16" fill="#f5c542" stroke="#1a0f05" stroke-width="1.5"/>
+      <circle cx="32" cy="32" r="11" fill="#c42b1c" stroke="#1a0f05" stroke-width="1"/>
+      <path d="M32 22v20M22 32h20" stroke="#1a0f05" stroke-width="1.5"/>
+      <circle cx="20" cy="40" r="3" fill="#fff7e1" stroke="#1a0f05" stroke-width="1"/>
+      <circle cx="20" cy="40" r="1.2" fill="#1a0f05"/>
+      <path d="M14 36c-2-2-2-6 0-7" fill="none" stroke="#1a0f05" stroke-width="1.5"/>
+      <path d="M44 28l4-4M48 30l4-2" stroke="#1a0f05" stroke-width="1.5" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="anchor" viewBox="0 0 64 64">
+      <circle cx="32" cy="14" r="6" fill="none" stroke="#f5c542" stroke-width="3"/>
+      <path d="M32 20v34M16 44c0 8 7 14 16 14s16-6 16-14M14 44h36" fill="none" stroke="#f5c542" stroke-width="3" stroke-linecap="round"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="grid-bg"></div>
+<div class="waves"></div>
+<div class="progress"></div>
+<div class="cursor"></div>
+
+<div class="hud">
+  <span><span class="dot"></span>LIVE · CAPTAIN'S LOG · GRAND LINE TRANSMISSION OPEN</span>
+  <span>EAST BLUE <b style="color:var(--gold)">CLEARED</b> · GRAND LINE <b style="color:var(--blood)">ACTIVE</b> · NEW WORLD <b style="color:var(--sea)">PLOTTED</b></span>
+</div>
+
+<nav>
+  <div class="nav-inner">
+    <div class="brand"><span class="roger"><svg width="24" height="24"><use href="#jolly"/></svg></span> KEERTHAN · NEKKANTI</div>
+    <ul>
+      <li><a href="#about">Captain</a></li>
+      <li><a href="#education">Academy</a></li>
+      <li><a href="#experience">Voyages</a></li>
+      <li><a href="#projects">Treasury</a></li>
+      <li><a href="#blog">Den Den</a></li>
+      <li><a href="#skills">Haki</a></li>
+      <li><a href="#contact">Letters</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="bounty-num" aria-hidden="true">฿</div>
+  <div class="hero-grid">
+    <div>
+      <div class="stencil">Confidential · Wanted Dossier · Marine HQ · 2026</div>
+      <h1>
+        <span class="first">Keerthan</span>
+        <span class="last">Nekkanti</span>
+      </h1>
+      <div class="typing"><span id="typing"></span><span class="caret"></span></div>
+
+      <div class="cta-row">
+        <a href="#experience" class="btn primary">Open Voyage Log <span class="arr">›</span></a>
+        <a href="#contact" class="btn secondary">Den Den Mushi <span class="arr">›</span></a>
+      </div>
+    </div>
+
+    <div class="three-wrap" id="threeWrap">
+      <canvas id="threeCanvas"></canvas>
+      <div class="corner tl"></div><div class="corner tr"></div>
+      <div class="corner bl"></div><div class="corner br"></div>
+      <div class="label">VESSEL · <b>THOUSAND SUNNY · KN-28</b> · LOG POSE LOCKED</div>
+    </div>
+  </div>
+</header>
+
+<div class="bounty">
+  <div class="stat"><div class="k">Bounty</div><div class="v">฿1.2B</div><div class="u">BELI · ESTIMATED</div></div>
+  <div class="stat gold"><div class="k">Records Sailed</div><div class="v">100M+</div><div class="u">SANCTIONS · BOFA</div></div>
+  <div class="stat sea"><div class="k">Transactions / Wk</div><div class="v">10M</div><div class="u">NEURAL NET · AML</div></div>
+  <div class="stat kraken"><div class="k">AI Agents</div><div class="v">46</div><div class="u">MAPSHOCK ORCHESTRATOR</div></div>
+  <div class="stat green"><div class="k">Speed Boost</div><div class="v">50%</div><div class="u">3HR → 10MIN PIPELINE</div></div>
+  <div class="stat"><div class="k">Crew</div><div class="v">CMU</div><div class="u">TEPPER · MSBA '26</div></div>
+</div>
+
+<div class="checkered"></div>
+
+<section id="about">
+  <div class="section-head">
+    <div>
+      <div class="file-id"><b>FILE-001</b> · MARINE INTEL · CAPTAIN PROFILE</div>
+      <h2>Captain's Dossier</h2>
+    </div>
+    <div class="meta">STATUS · <span class="ok">AT LARGE</span> · 2026.05</div>
+  </div>
+
+  <div class="about-grid">
+    <div class="dossier">
+      <span class="tag">Personnel Brief</span>
+      <span class="stamp">Verified</span>
+      <p>Software engineer turned analytics navigator, freshly graduated from the <b>Carnegie Mellon · Tepper</b> MSBA crew (May 2026) after charting three Bank of America years through the Grand Line — Java, Spring Boot, neural nets, NLP, and 100M+ records of sanctions data. The engine room was built at BofA; CMU sharpened the captain's eye for reading the weather of decisions.</p>
+      <p>I sail at the intersection of <b>software, AI and analytics</b> — designing systems that survive open ocean: agentic AI orchestration, fraud detection neural nets, and ETL pipelines that don't flinch at scale. I write code the way pirates rig sails: redundant, fast, and ready for the next storm.</p>
+      <p>Currently captaining <b>MapShock</b> — an enterprise-grade agentic AI platform that deploys 46 specialized agents to scout finance, geopolitics, cyber, and supply chain seas — turning oceans of noise into cited intelligence.</p>
+    </div>
+    <div class="wanted">
+      <div class="top">WANTED</div>
+      <div class="photo">
+        <svg viewBox="0 0 100 100"><use href="#strawhat" x="14" y="-2" width="72" height="48"/><circle cx="50" cy="62" r="22" fill="#1a0f05"/><rect x="34" y="80" width="32" height="14" fill="#1a0f05"/></svg>
+      </div>
+      <div class="name">KEERTHAN</div>
+      <div class="alias">"THE DATA NAVIGATOR"</div>
+      <div class="bounty"><span class="sym">฿</span><span class="amt">1,200,000,000</span></div>
+      <div class="marine">— MARINE HQ · ENIES LOBBY DIV. —</div>
+    </div>
+  </div>
+</section>
+
+<section id="education">
+  <div class="section-head">
+    <div>
+      <div class="file-id"><b>FILE-002</b> · ACADEMY · CREW ORIGINS</div>
+      <h2>Academy Records</h2>
+    </div>
+    <div class="meta">2 ENTRIES · CLEARED</div>
+  </div>
+
+  <div class="timeline">
+    <div class="dossier">
+      <span class="tag">Newly Graduated</span>
+      <h3>Carnegie Mellon University · Tepper School of Business</h3>
+      <div class="sub">M.S. Business Analytics · Pittsburgh, PA · Graduated May 2026</div>
+      <p>Optimization, machine learning, and applied analytics — the kind of training that turns raw telemetry into boardroom decisions. Now sailing the New World of business strategy with the diploma in the chest.</p>
+      <ul>
+        <li><b>Teaching Assistant</b> for Introduction to R and Python — guided the next crew through their first lap around the data ocean</li>
+        <li>Coursework in optimization, machine learning, statistics, and business strategy</li>
+        <li>Hands-on consulting capstone with Deloitte — Data Sourcing Lead</li>
+      </ul>
+    </div>
+    <div class="dossier">
+      <span class="tag">East Blue Origins</span>
+      <h3>Manipal Academy of Higher Education · Manipal Institute of Technology</h3>
+      <div class="sub">B.Tech Computer Science · Big Data Specialization · India · 2022</div>
+      <p>The engine block under every voyage — algorithms, distributed systems, big data, and the discipline of building things that scale.</p>
+      <ul>
+        <li><b>Database Head</b> of Sports Club — kept the crew's records ship-shape</li>
+        <li>Active in Information Security Club &amp; Cultural Club — code, ciphers, and storytelling</li>
+        <li>Specialization in Big Data — Hadoop, Spark, distributed pipelines</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="experience">
+  <div class="section-head">
+    <div>
+      <div class="file-id"><b>FILE-003</b> · VOYAGE LOG · BOUNTY HISTORY</div>
+      <h2>Voyage Log</h2>
+    </div>
+    <div class="meta">3 YEARS · 2 MEDALS · 2022—2025</div>
+  </div>
+
+  <div class="timeline">
+    <div class="dossier">
+      <span class="tag">Bank of America · Hyderabad</span>
+      <span class="stamp">Gold Medal</span>
+      <h3>Officer · Software Engineer 1A</h3>
+      <div class="sub">Sanctions Compliance · Java · Spring Boot · React.js · Jul 2024 – Jul 2025</div>
+      <p>Final stint of the BofA voyage — promoted to lead the sanctions data engine that BofA's compliance crews trust to keep the ship out of forbidden waters.</p>
+      <ul>
+        <li><b>Process Improvement</b> — Automated data collection from <b>seven international markets</b> using Java Spring Boot and React.js, ensuring compliance with global economic sanctions regimes</li>
+        <li><b>Data Management</b> — Onboarded and managed <b>100M+ records</b> of sanctions data, optimizing the document framework for real-time data processing and accuracy</li>
+        <li><b>Data Processing</b> — Implemented advanced algorithms and an automation framework, slashing processing time from <b>3 hours to 10 minutes</b> and reducing server processing hours by <b>~24%</b></li>
+        <li><b>Initiative</b> — Established data quality controls; the system absorbed a <b>60% volume surge with zero downtime</b>. Recipient of the <b>BofA Gold Award</b> for outstanding performance</li>
+      </ul>
+    </div>
+
+    <div class="dossier">
+      <span class="tag">Bank of America · Hyderabad</span>
+      <span class="stamp">Silver Medal</span>
+      <h3>Officer · Software Engineer 1B</h3>
+      <div class="sub">AML · Neural Networks · NLP · Synthetic Data · Jul 2022 – Jun 2024</div>
+      <p>First two years on the Grand Line — diving into anti-money-laundering with neural networks, NLP, and synthetic data generation. Where the data navigator name was earned.</p>
+      <ul>
+        <li><b>Problem Solving</b> — Designed a <b>neural network</b> to process <b>10M transactions weekly</b>, streamlining detection of money laundering patterns, improving processing speed by <b>50%</b>, and establishing rapid-response capabilities</li>
+        <li><b>Data Analysis</b> — Created an <b>NLP model</b> to analyze money laundering patterns, reducing false positives by <b>20%</b></li>
+        <li><b>Innovation</b> — Built a <b>synthetic data generation model</b> that lets teams build and test applications globally while staying compliant with regulations. Recipient of the <b>BofA Silver Award</b> for outstanding performance</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="projects">
+  <div class="section-head">
+    <div>
+      <div class="file-id"><b>FILE-004</b> · TREASURY · DEVIL FRUIT VAULT</div>
+      <h2>The Treasury</h2>
+    </div>
+    <div class="meta">SELECTED HAULS</div>
+  </div>
+
+  <div class="garage">
+    <div class="machine">
+      <span class="badge">Personal · Agentic AI</span>
+      <h3>MapShock — Enterprise Agentic AI Platform</h3>
+      <p>An intelligent orchestrator coordinating <b style="color:var(--gold)">46 specialized AI agents</b> across finance, geopolitics, cybersecurity, and supply chain — turning a strategic question into a fully cited intelligence report in minutes.</p>
+      <div class="specs">
+        <span>Stack</span><b>Python · LLMs · Agents</b>
+        <span>Agents</span><b>46 specialized</b>
+        <span>QA</span><b>6-Gate Pipeline</b>
+        <span>Status</span><b style="color:var(--gold)">Live R&amp;D</b>
+      </div>
+    </div>
+    <div class="machine">
+      <span class="badge">Capstone · Deloitte</span>
+      <h3>Deloitte MSBA Capstone — Data Sourcing Lead</h3>
+      <p>Designed and implemented SQL-based data acquisition and ETL pipelines for efficient integration; led data sanitization, cleaning, and quality assurance across messy, multi-source datasets.</p>
+      <div class="specs">
+        <span>Stack</span><b>SQL · ETL · Python</b>
+        <span>Role</span><b>Data Sourcing Lead</b>
+        <span>Period</span><b>Jan – Apr 2026</b>
+        <span>Status</span><b style="color:var(--gold)">Shipped</b>
+      </div>
+    </div>
+    <div class="machine">
+      <span class="badge">IEEE · Cryptography</span>
+      <h3>Lightweight Ciphers for Image Security</h3>
+      <p>IEEE conference paper benchmarking <b style="color:var(--gold)">SIT, LEA, Twine, and PRESENT</b> for securing digital images on resource-constrained devices — measuring encryption speed, robustness, and computational cost.</p>
+      <div class="specs">
+        <span>Type</span><b>IEEE Paper</b>
+        <span>Domain</span><b>IoT · Crypto</b>
+        <span>Ciphers</span><b>4 benchmarked</b>
+        <span>Status</span><b style="color:var(--gold)">Published</b>
+      </div>
+    </div>
+    <div class="machine">
+      <span class="badge">Mobile · Networking Research</span>
+      <h3>Social Interaction Capture App</h3>
+      <p>A mobile app to capture social interaction data for <b>opportunistic networking</b> research — a real-world dataset to study how devices &amp; people meet, connect, and exchange information in the wild.</p>
+      <div class="specs">
+        <span>Stack</span><b>Mobile · Sensors</b>
+        <span>Output</span><b>Research dataset</b>
+        <span>Lab</span><b>Manipal · 2021</b>
+        <span>Status</span><b style="color:var(--gold)">Archived</b>
+      </div>
+    </div>
+    <div class="machine">
+      <span class="badge">BofA · Synthetic Data</span>
+      <h3>Synthetic Data Generation Engine</h3>
+      <p>Generative model producing compliant synthetic data so global teams can build, test, and demo applications without ever touching protected production datasets.</p>
+      <div class="specs">
+        <span>Stack</span><b>Python · ML</b>
+        <span>Use</span><b>Global App Dev</b>
+        <span>Compliance</span><b>Region-aware</b>
+        <span>Status</span><b style="color:var(--gold)">Production</b>
+      </div>
+    </div>
+    <div class="machine">
+      <span class="badge">BofA · NLP · AML</span>
+      <h3>AML Neural Net + NLP Engine</h3>
+      <p>Neural network processing <b>10M transactions/week</b> paired with an NLP model that reads case narratives — together cutting false positives by <b>20%</b> and detection latency in half.</p>
+      <div class="specs">
+        <span>Stack</span><b>TensorFlow · NLP</b>
+        <span>Throughput</span><b>10M / week</b>
+        <span>FP Drop</span><b>−20%</b>
+        <span>Status</span><b style="color:var(--gold)">Production</b>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="blog">
+  <div class="section-head">
+    <div>
+      <div class="file-id"><b>FILE-005</b> · DEN DEN MUSHI · TRANSMISSIONS</div>
+      <h2>Den Den Mushi Log</h2>
+    </div>
+    <div class="meta">3 TRANSMISSIONS</div>
+  </div>
+
+  <div class="radio">
+    <a class="msg" href="post-agi.html">
+      <svg class="denden" viewBox="0 0 64 64"><use href="#dendenmushi"/></svg>
+      <div>
+        <div class="title">The Search for AGI · Hunting the All Blue</div>
+        <div class="sub">Why general intelligence is the One Piece of our generation — and what it actually takes to find it</div>
+      </div>
+      <span class="pill">Open ›</span>
+    </a>
+    <a class="msg" href="post-sensory-ai.html">
+      <svg class="denden" viewBox="0 0 64 64"><use href="#dendenmushi"/></svg>
+      <div>
+        <div class="title">Sensory Devices &amp; AI · Engineering Observation Haki</div>
+        <div class="sub">From IoT crypto to multimodal models — how machines are learning to "feel" the world</div>
+      </div>
+      <span class="pill">Open ›</span>
+    </a>
+    <a class="msg" href="post-agentic-ai.html">
+      <svg class="denden" viewBox="0 0 64 64"><use href="#dendenmushi"/></svg>
+      <div>
+        <div class="title">From Bank Vaults to Agentic Crews</div>
+        <div class="sub">Lessons from BofA &amp; MapShock on building AI systems that act, not just answer</div>
+      </div>
+      <span class="pill">Open ›</span>
+    </a>
+  </div>
+</section>
+
+<section id="skills">
+  <div class="section-head">
+    <div>
+      <div class="file-id"><b>FILE-006</b> · HAKI · TECH ARSENAL</div>
+      <h2>Haki &amp; Devil Fruits</h2>
+    </div>
+    <div class="meta">CALIBRATED · 2026.05</div>
+  </div>
+
+  <div class="setup">
+    <div class="gauge"><div class="name"><b>Java · Spring Boot</b><span>94%</span></div><div class="bar"><div class="fill" data-fill="94"></div></div></div>
+    <div class="gauge gold"><div class="name"><b>Python</b><span>92%</span></div><div class="bar"><div class="fill" data-fill="92"></div></div></div>
+    <div class="gauge sea"><div class="name"><b>SQL · Teradata</b><span>90%</span></div><div class="bar"><div class="fill" data-fill="90"></div></div></div>
+    <div class="gauge"><div class="name"><b>React.js</b><span>85%</span></div><div class="bar"><div class="fill" data-fill="85"></div></div></div>
+    <div class="gauge kraken"><div class="name"><b>Neural Networks · TF</b><span>88%</span></div><div class="bar"><div class="fill" data-fill="88"></div></div></div>
+    <div class="gauge gold"><div class="name"><b>NLP · LLMs</b><span>86%</span></div><div class="bar"><div class="fill" data-fill="86"></div></div></div>
+    <div class="gauge sea"><div class="name"><b>Apache Spark</b><span>82%</span></div><div class="bar"><div class="fill" data-fill="82"></div></div></div>
+    <div class="gauge"><div class="name"><b>Docker · Cloud</b><span>80%</span></div><div class="bar"><div class="fill" data-fill="80"></div></div></div>
+  </div>
+
+  <div class="fruits">
+    <div class="fruit"><svg><use href="#fruit"/></svg><div><div class="ft">Agent-Agent no Mi</div><div class="fs">Agentic AI Orchestration</div></div></div>
+    <div class="fruit"><svg><use href="#fruit"/></svg><div><div class="ft">Net-Net no Mi</div><div class="fs">Neural Networks</div></div></div>
+    <div class="fruit"><svg><use href="#fruit"/></svg><div><div class="ft">Lex-Lex no Mi</div><div class="fs">NLP &amp; Language</div></div></div>
+    <div class="fruit"><svg><use href="#fruit"/></svg><div><div class="ft">Synth-Synth no Mi</div><div class="fs">Synthetic Data</div></div></div>
+    <div class="fruit"><svg><use href="#fruit"/></svg><div><div class="ft">Pipe-Pipe no Mi</div><div class="fs">ETL Pipelines</div></div></div>
+    <div class="fruit"><svg><use href="#fruit"/></svg><div><div class="ft">Cipher-Cipher no Mi</div><div class="fs">Cryptography &amp; Security</div></div></div>
+  </div>
+
+  <div class="stack" style="margin-top:1.5rem;">
+    <span class="chip">Java</span>
+    <span class="chip">Python</span>
+    <span class="chip">Spring Boot</span>
+    <span class="chip">React.js</span>
+    <span class="chip">Flutter</span>
+    <span class="chip">Django</span>
+    <span class="chip">RESTful APIs</span>
+    <span class="chip">Teradata</span>
+    <span class="chip">TensorFlow</span>
+    <span class="chip">Scikit-learn</span>
+    <span class="chip">Apache Spark</span>
+    <span class="chip">Docker</span>
+    <span class="chip">SQL · ETL</span>
+    <span class="chip">Neural Networks</span>
+    <span class="chip">NLP</span>
+    <span class="chip">Agentic AI · LLMs</span>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="section-head">
+    <div>
+      <div class="file-id"><b>FILE-007</b> · LETTERS · CONTACT</div>
+      <h2>Letters to the Captain</h2>
+    </div>
+    <div class="meta">DEN DEN · OPEN</div>
+  </div>
+
+  <div class="pit">
+    <div class="dossier">
+      <span class="tag">Direct Channel</span>
+      <h3>Set Sail · Let's Talk</h3>
+      <p>Looking for a software engineer who's also an analytics navigator — someone who has shipped neural nets at <b>10M transactions a week</b>, orchestrated <b>46-agent AI fleets</b>, and managed <b>100M+ records</b> without losing a sail? The Den Den Mushi is open.</p>
+      <p>Open to <b>full-time roles in 2026</b> across software engineering, analytics, AI, and applied ML. Pittsburgh-based, will follow the log pose anywhere worth charting.</p>
+      <p style="color:var(--muted);font-family:var(--mono);font-size:0.78rem;letter-spacing:0.12em;">Carnegie Mellon · Tepper · MSBA '26 · Pittsburgh, PA</p>
+    </div>
+
+    <div class="channel">
+      <a href="mailto:knekkant@tepper.cmu.edu">
+        <div>
+          <div class="k">Primary Den Den</div>
+          <div>knekkant@tepper.cmu.edu</div>
+        </div>
+        <span class="arr">›</span>
+      </a>
+      <a href="tel:+15129020917">
+        <div>
+          <div class="k">Visual Den Den</div>
+          <div>+1 (512) 902-0917</div>
+        </div>
+        <span class="arr">›</span>
+      </a>
+      <a href="https://www.linkedin.com/in/keerthan-nekkanti" target="_blank" rel="noopener">
+        <div>
+          <div class="k">LinkedIn</div>
+          <div>linkedin.com/in/keerthan-nekkanti</div>
+        </div>
+        <span class="arr">›</span>
+      </a>
+      <a href="https://github.com/Keerthan28" target="_blank" rel="noopener">
+        <div>
+          <div class="k">GitHub · Treasure Map</div>
+          <div>github.com/Keerthan28</div>
+        </div>
+        <span class="arr">›</span>
+      </a>
+      <a href="#about">
+        <div>
+          <div class="k">Wanted Poster</div>
+          <div>Return to captain's dossier</div>
+        </div>
+        <span class="arr">›</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<div class="checkered"></div>
+
+<footer>
+  © 2026 · Keerthan Nekkanti · <span class="sig">KN-28 · Captain of the Data Pirates</span> · Charted from Pittsburgh, PA
+</footer>
+
+<script>
+const progress = document.querySelector('.progress');
+window.addEventListener('scroll', () => {
+  const s = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
+  progress.style.width = s + '%';
+});
+const cursor = document.querySelector('.cursor');
+window.addEventListener('mousemove', e => {
+  cursor.style.left = e.clientX + 'px';
+  cursor.style.top = e.clientY + 'px';
+});
+document.querySelectorAll('a, .btn, .machine, .dossier, .msg, .fruit').forEach(el => {
+  el.addEventListener('mouseenter', () => { cursor.style.width = '50px'; cursor.style.height = '50px'; cursor.style.borderColor = 'rgba(245,197,66,0.95)'; });
+  el.addEventListener('mouseleave', () => { cursor.style.width = '30px'; cursor.style.height = '30px'; cursor.style.borderColor = 'rgba(245,197,66,0.7)'; });
+});
+const texts = [
+  'SOFTWARE ENGINEER · AI · ANALYTICS NAVIGATOR',
+  'MSBA @ CARNEGIE MELLON · TEPPER 2026',
+  'EX-BANK OF AMERICA · GOLD & SILVER AWARDS',
+  '46 AGENTS · 10M TXNS / WK · 100M RECORDS',
+  'SAILING THE GRAND LINE OF DATA'
+];
+let ti = 0, tj = 0, del = false;
+const tEl = document.getElementById('typing');
+setInterval(() => {
+  tEl.textContent = texts[ti].slice(0, tj);
+  if (!del && tj++ === texts[ti].length) { del = true; setTimeout(()=>{}, 800); }
+  else if (del && tj-- === 0) { del = false; ti = (ti + 1) % texts.length; }
+}, 70);
+const sections = document.querySelectorAll('section');
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      e.target.querySelectorAll('.fill').forEach(f => {
+        const v = f.getAttribute('data-fill') || 80;
+        f.style.width = v + '%';
+      });
+    }
+  });
+}, { threshold: 0.12 });
+sections.forEach(s => io.observe(s));
+const bountyEl = document.querySelector('.stat .v');
+setInterval(() => {
+  if (!bountyEl) return;
+  const variants = ['฿1.2B','฿1.21B','฿1.19B','฿1.20B','฿1.22B'];
+  bountyEl.textContent = variants[Math.floor(Math.random()*variants.length)];
+}, 1600);
+</script>
+
+<script>
+(function () {
+  const canvas = document.getElementById('threeCanvas');
+  const wrap = document.getElementById('threeWrap');
+  if (!canvas || !window.THREE) return;
+
+  const scene = new THREE.Scene();
+  scene.fog = new THREE.Fog(0x07090f, 8, 22);
+
+  const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 100);
+  camera.position.set(5.6, 3.4, 6.8);
+  camera.lookAt(0, 1.0, 0);
+
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  function resize() {
+    const r = wrap.getBoundingClientRect();
+    renderer.setSize(r.width, r.height, false);
+    camera.aspect = r.width / r.height;
+    camera.updateProjectionMatrix();
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  scene.add(new THREE.AmbientLight(0x6b6080, 0.55));
+  const moon = new THREE.DirectionalLight(0xfff3c2, 1.0);
+  moon.position.set(5, 8, 4); scene.add(moon);
+  const lantern = new THREE.PointLight(0xf5c542, 2.4, 14);
+  lantern.position.set(-2.5, 2, -1.5); scene.add(lantern);
+  const seaLight = new THREE.PointLight(0x1976d2, 0.7, 12);
+  seaLight.position.set(3, 0.4, 3); scene.add(seaLight);
+
+  const oceanGeo = new THREE.PlaneGeometry(24, 24, 48, 48);
+  const oceanMat = new THREE.MeshStandardMaterial({
+    color: 0x0d3a66, roughness: 0.55, metalness: 0.25,
+    transparent: true, opacity: 0.95
+  });
+  const ocean = new THREE.Mesh(oceanGeo, oceanMat);
+  ocean.rotation.x = -Math.PI / 2;
+  ocean.position.y = -0.9;
+  scene.add(ocean);
+  const oceanPos = oceanGeo.attributes.position;
+
+  const ringGeo = new THREE.RingGeometry(2.4, 2.55, 64);
+  const ringMat = new THREE.MeshBasicMaterial({ color: 0xf5c542, transparent: true, opacity: 0.55, side: THREE.DoubleSide });
+  const ring = new THREE.Mesh(ringGeo, ringMat);
+  ring.rotation.x = -Math.PI / 2; ring.position.y = -0.85;
+  scene.add(ring);
+  const ringGeo2 = new THREE.RingGeometry(3.0, 3.04, 64);
+  const ringMat2 = new THREE.MeshBasicMaterial({ color: 0xc42b1c, transparent: true, opacity: 0.35, side: THREE.DoubleSide });
+  const ring2 = new THREE.Mesh(ringGeo2, ringMat2);
+  ring2.rotation.x = -Math.PI / 2; ring2.position.y = -0.85;
+  scene.add(ring2);
+
+  const ship = new THREE.Group();
+  scene.add(ship);
+
+  const woodMat = new THREE.MeshStandardMaterial({ color: 0x8b5a2b, roughness: 0.85, metalness: 0.1 });
+  const woodDarkMat = new THREE.MeshStandardMaterial({ color: 0x5d3a1a, roughness: 0.9, metalness: 0.1 });
+  const sailMat = new THREE.MeshStandardMaterial({ color: 0xf4e6c8, roughness: 0.95, metalness: 0, side: THREE.DoubleSide });
+  const flagMat = new THREE.MeshStandardMaterial({ color: 0x1a0f05, roughness: 0.9, metalness: 0, side: THREE.DoubleSide });
+  const goldMat = new THREE.MeshStandardMaterial({ color: 0xf5c542, roughness: 0.3, metalness: 0.85, emissive: 0x331f00, emissiveIntensity: 0.4 });
+  const redMat = new THREE.MeshStandardMaterial({ color: 0xc42b1c, roughness: 0.55, metalness: 0.2 });
+
+  // ============================================================
+  // THOUSAND SUNNY — stylized
+  // ============================================================
+  const grassMat = new THREE.MeshStandardMaterial({ color: 0x4caf50, roughness: 0.9, metalness: 0 });
+  const orangeMat = new THREE.MeshStandardMaterial({ color: 0xff8c1a, roughness: 0.6, metalness: 0.2 });
+  const glassMat = new THREE.MeshStandardMaterial({ color: 0x80d8ff, transparent: true, opacity: 0.55, roughness: 0.1, metalness: 0.4, emissive: 0x1976d2, emissiveIntensity: 0.4 });
+
+  /* HULL — broader, with golden trim & orange waterline */
+  const hull = new THREE.Mesh(new THREE.BoxGeometry(3.9, 0.85, 1.5), woodMat);
+  hull.position.y = -0.2; ship.add(hull);
+  const hullLow = new THREE.Mesh(new THREE.BoxGeometry(3.3, 0.55, 1.3), woodDarkMat);
+  hullLow.position.y = -0.65; ship.add(hullLow);
+  const keel = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.2, 0.5), woodDarkMat);
+  keel.position.y = -0.95; ship.add(keel);
+  /* gold top trim */
+  const trimTop = new THREE.Mesh(new THREE.BoxGeometry(3.92, 0.08, 1.52), goldMat);
+  trimTop.position.y = 0.18; ship.add(trimTop);
+  /* orange waterline stripe */
+  const waterline = new THREE.Mesh(new THREE.BoxGeometry(3.92, 0.1, 1.52), orangeMat);
+  waterline.position.y = -0.45; ship.add(waterline);
+  /* hull side portholes */
+  for (let s of [-1, 1]) {
+    for (let i = -2; i <= 2; i++) {
+      const ph = new THREE.Mesh(new THREE.CircleGeometry(0.06, 12), goldMat);
+      ph.position.set(i * 0.55, -0.15, s * 0.761);
+      ph.rotation.y = s > 0 ? 0 : Math.PI;
+      ship.add(ph);
+    }
+  }
+
+  /* BOW — pointed prow */
+  const bow = new THREE.Mesh(new THREE.ConeGeometry(0.6, 1.0, 4), woodMat);
+  bow.rotation.z = Math.PI / 2; bow.rotation.x = Math.PI / 4;
+  bow.position.set(2.15, -0.2, 0); bow.scale.set(1, 1.6, 1); ship.add(bow);
+
+  // ============================================================
+  // LION FIGUREHEAD — the soul of the Sunny
+  // ============================================================
+  const lion = new THREE.Group();
+  ship.add(lion);
+  /* mane — big red ring of fur */
+  const lionMane = new THREE.Mesh(new THREE.TorusGeometry(0.5, 0.18, 14, 24), redMat);
+  lionMane.rotation.y = Math.PI / 2;
+  lionMane.position.set(2.55, 0.25, 0);
+  lion.add(lionMane);
+  /* secondary mane layer for fluffiness */
+  const lionMane2 = new THREE.Mesh(new THREE.TorusGeometry(0.42, 0.14, 12, 20), new THREE.MeshStandardMaterial({ color: 0xc89b1f, roughness: 0.8, metalness: 0.3 }));
+  lionMane2.rotation.y = Math.PI / 2;
+  lionMane2.position.set(2.6, 0.25, 0);
+  lion.add(lionMane2);
+  /* head — gold sphere */
+  const lionHead = new THREE.Mesh(new THREE.SphereGeometry(0.4, 18, 14), goldMat);
+  lionHead.position.set(2.62, 0.25, 0);
+  lion.add(lionHead);
+  /* snout */
+  const lionSnout = new THREE.Mesh(new THREE.ConeGeometry(0.16, 0.3, 12), goldMat);
+  lionSnout.rotation.z = -Math.PI / 2;
+  lionSnout.position.set(2.92, 0.2, 0);
+  lion.add(lionSnout);
+  /* eyes */
+  const eyeMat = new THREE.MeshStandardMaterial({ color: 0x1a0f05, roughness: 0.4 });
+  const lEyeL = new THREE.Mesh(new THREE.SphereGeometry(0.045, 10, 8), eyeMat);
+  lEyeL.position.set(2.85, 0.36, 0.13); lion.add(lEyeL);
+  const lEyeR = new THREE.Mesh(new THREE.SphereGeometry(0.045, 10, 8), eyeMat);
+  lEyeR.position.set(2.85, 0.36, -0.13); lion.add(lEyeR);
+  /* ears */
+  const lEarL = new THREE.Mesh(new THREE.ConeGeometry(0.08, 0.14, 8), goldMat);
+  lEarL.rotation.x = -0.3; lEarL.position.set(2.55, 0.55, 0.22); lion.add(lEarL);
+  const lEarR = new THREE.Mesh(new THREE.ConeGeometry(0.08, 0.14, 8), goldMat);
+  lEarR.rotation.x = 0.3; lEarR.position.set(2.55, 0.55, -0.22); lion.add(lEarR);
+
+  // ============================================================
+  // DECK + GRASS LAWN (Sunny's iconic green deck)
+  // ============================================================
+  const deck = new THREE.Mesh(new THREE.BoxGeometry(3.5, 0.08, 1.2), woodDarkMat);
+  deck.position.y = 0.22; ship.add(deck);
+  /* grass on top */
+  const grass = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.06, 1.0), grassMat);
+  grass.position.y = 0.29; ship.add(grass);
+  /* grass tufts */
+  for (let i = 0; i < 8; i++) {
+    const tuft = new THREE.Mesh(new THREE.ConeGeometry(0.04, 0.08, 6), grassMat);
+    tuft.position.set((Math.random() - 0.5) * 2.4, 0.34, (Math.random() - 0.5) * 0.85);
+    ship.add(tuft);
+  }
+  /* gold rails */
+  [-0.6, 0.6].forEach(z => {
+    const rail = new THREE.Mesh(new THREE.BoxGeometry(3.3, 0.05, 0.05), goldMat);
+    rail.position.set(0, 0.4, z); ship.add(rail);
+    /* rail posts */
+    for (let i = -3; i <= 3; i++) {
+      const post = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 0.18, 6), goldMat);
+      post.position.set(i * 0.45, 0.31, z); ship.add(post);
+    }
+  });
+
+  // ============================================================
+  // STERN CASTLE (the tall back of Sunny with the helm)
+  // ============================================================
+  const stern = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.55, 1.15), woodMat);
+  stern.position.set(-1.55, 0.45, 0); ship.add(stern);
+  const sternTop = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.06, 1.18), woodDarkMat);
+  sternTop.position.set(-1.55, 0.74, 0); ship.add(sternTop);
+  /* ship's wheel (helm) */
+  const helm = new THREE.Mesh(new THREE.TorusGeometry(0.11, 0.022, 8, 16), woodDarkMat);
+  helm.rotation.y = Math.PI / 2;
+  helm.position.set(-1.4, 0.95, 0); ship.add(helm);
+  for (let i = 0; i < 8; i++) {
+    const spoke = new THREE.Mesh(new THREE.BoxGeometry(0.013, 0.24, 0.013), woodDarkMat);
+    spoke.rotation.x = (i / 8) * Math.PI * 2;
+    spoke.position.set(-1.4, 0.95, 0); ship.add(spoke);
+  }
+
+  // ============================================================
+  // PADDLE WHEELS (Sunny's "Coup de Burst" side wheels)
+  // ============================================================
+  function makePaddle(zSign) {
+    const grp = new THREE.Group();
+    const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.34, 0.16, 16), woodDarkMat);
+    wheel.rotation.x = Math.PI / 2; grp.add(wheel);
+    const inner = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 0.18, 16), goldMat);
+    inner.rotation.x = Math.PI / 2; grp.add(inner);
+    /* paddle blades */
+    for (let i = 0; i < 6; i++) {
+      const blade = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.55, 0.16), woodMat);
+      blade.rotation.z = (i / 6) * Math.PI * 2;
+      grp.add(blade);
+    }
+    /* hub cap */
+    const hub = new THREE.Mesh(new THREE.SphereGeometry(0.07, 10, 10), goldMat);
+    grp.add(hub);
+    grp.position.set(-0.7, -0.3, zSign * 0.78);
+    return grp;
+  }
+  const paddleL = makePaddle(1); ship.add(paddleL);
+  const paddleR = makePaddle(-1); ship.add(paddleR);
+
+  // ============================================================
+  // MAIN MAST + SAIL with the iconic SUN
+  // ============================================================
+  const mast = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.09, 3.7, 12), woodDarkMat);
+  mast.position.set(0.2, 1.7, 0); ship.add(mast);
+  const yard = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 1.9, 8), woodDarkMat);
+  yard.rotation.z = Math.PI / 2; yard.position.set(0.2, 2.4, 0); ship.add(yard);
+  const mainSail = new THREE.Mesh(new THREE.PlaneGeometry(1.75, 1.7, 10, 10), sailMat);
+  mainSail.position.set(0.2, 1.7, 0); ship.add(mainSail);
+  /* SUN MARK — golden sun on the sail */
+  const sunDisc = new THREE.Mesh(new THREE.CircleGeometry(0.42, 32), new THREE.MeshStandardMaterial({ color: 0xffb732, emissive: 0x331a00, emissiveIntensity: 0.6, roughness: 0.4, metalness: 0.5 }));
+  sunDisc.position.set(0.2, 1.7, 0.012); ship.add(sunDisc);
+  /* sun face: two eyes + mouth */
+  const sunEyeL = new THREE.Mesh(new THREE.CircleGeometry(0.06, 12), redMat);
+  sunEyeL.position.set(0.1, 1.78, 0.022); ship.add(sunEyeL);
+  const sunEyeR = new THREE.Mesh(new THREE.CircleGeometry(0.06, 12), redMat);
+  sunEyeR.position.set(0.3, 1.78, 0.022); ship.add(sunEyeR);
+  const sunSmile = new THREE.Mesh(new THREE.RingGeometry(0.13, 0.15, 24, 1, 0.15 * Math.PI, 0.7 * Math.PI), redMat);
+  sunSmile.rotation.z = Math.PI;
+  sunSmile.position.set(0.2, 1.66, 0.022); ship.add(sunSmile);
+  /* sun rays — short triangular spikes around */
+  const sunRays = new THREE.Group();
+  for (let i = 0; i < 12; i++) {
+    const ray = new THREE.Mesh(new THREE.ConeGeometry(0.05, 0.18, 6), new THREE.MeshStandardMaterial({ color: 0xffb732, emissive: 0x331a00, emissiveIntensity: 0.5 }));
+    const ang = (i / 12) * Math.PI * 2;
+    ray.position.set(0.2 + Math.cos(ang) * 0.55, 1.7 + Math.sin(ang) * 0.55, 0.012);
+    ray.rotation.z = ang - Math.PI / 2;
+    sunRays.add(ray);
+  }
+  ship.add(sunRays);
+
+  // ============================================================
+  // MIZZEN MAST (smaller, behind main)
+  // ============================================================
+  const mizzen = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.07, 2.7, 12), woodDarkMat);
+  mizzen.position.set(-1.55, 1.2, 0); ship.add(mizzen);
+  const mizYard = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 1.2, 8), woodDarkMat);
+  mizYard.rotation.z = Math.PI / 2; mizYard.position.set(-1.55, 1.85, 0); ship.add(mizYard);
+  const mizSail = new THREE.Mesh(new THREE.PlaneGeometry(1.1, 1.2), sailMat);
+  mizSail.position.set(-1.55, 1.25, 0); ship.add(mizSail);
+  /* small sun on mizzen */
+  const miniSun = new THREE.Mesh(new THREE.CircleGeometry(0.22, 24), new THREE.MeshStandardMaterial({ color: 0xffb732, emissive: 0x331a00, emissiveIntensity: 0.6 }));
+  miniSun.position.set(-1.55, 1.25, 0.012); ship.add(miniSun);
+
+  // ============================================================
+  // CROW'S NEST — Sunny's giant glass observation dome
+  // ============================================================
+  const nestBase = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.36, 0.18, 16), woodMat);
+  nestBase.position.set(0.2, 2.85, 0); ship.add(nestBase);
+  const nestRing = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.34, 0.04, 16), goldMat);
+  nestRing.position.set(0.2, 2.96, 0); ship.add(nestRing);
+  const nestRoom = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 0.32, 16), glassMat);
+  nestRoom.position.set(0.2, 3.14, 0); ship.add(nestRoom);
+  const nestDome = new THREE.Mesh(new THREE.SphereGeometry(0.3, 16, 10, 0, Math.PI * 2, 0, Math.PI / 2), goldMat);
+  nestDome.position.set(0.2, 3.30, 0); ship.add(nestDome);
+
+  // ============================================================
+  // STRAW HAT JOLLY ROGER — flag at the very top
+  // ============================================================
+  const flagPole = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.7, 8), woodDarkMat);
+  flagPole.position.set(0.2, 3.85, 0); ship.add(flagPole);
+  const flag = new THREE.Mesh(new THREE.PlaneGeometry(0.55, 0.4), flagMat);
+  flag.position.set(0.52, 3.95, 0); ship.add(flag);
+  const skull = new THREE.Mesh(new THREE.CircleGeometry(0.085, 16), sailMat);
+  skull.position.set(0.52, 3.96, 0.01); ship.add(skull);
+  const skullEyeL = new THREE.Mesh(new THREE.CircleGeometry(0.018, 10), flagMat);
+  skullEyeL.position.set(0.502, 3.98, 0.02); ship.add(skullEyeL);
+  const skullEyeR = new THREE.Mesh(new THREE.CircleGeometry(0.018, 10), flagMat);
+  skullEyeR.position.set(0.538, 3.98, 0.02); ship.add(skullEyeR);
+  const bone1 = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.012, 0.012), sailMat);
+  bone1.rotation.z = Math.PI / 4; bone1.position.set(0.52, 3.91, 0.02); ship.add(bone1);
+  const bone2 = bone1.clone(); bone2.rotation.z = -Math.PI / 4; ship.add(bone2);
+  /* straw hat above skull */
+  const hatBrim = new THREE.Mesh(new THREE.TorusGeometry(0.08, 0.013, 8, 16), new THREE.MeshStandardMaterial({ color: 0xf5d57a }));
+  hatBrim.rotation.x = Math.PI / 2;
+  hatBrim.position.set(0.52, 4.05, 0.02); ship.add(hatBrim);
+  const hatTop = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.05, 12), new THREE.MeshStandardMaterial({ color: 0xf5d57a }));
+  hatTop.position.set(0.52, 4.07, 0.02); ship.add(hatTop);
+  const hatBand = new THREE.Mesh(new THREE.TorusGeometry(0.046, 0.008, 6, 14), redMat);
+  hatBand.rotation.x = Math.PI / 2;
+  hatBand.position.set(0.52, 4.06, 0.02); ship.add(hatBand);
+
+  // ============================================================
+  // LANTERNS
+  // ============================================================
+  const lantern1 = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.16, 0.1), goldMat);
+  lantern1.position.set(1.7, 0.45, 0.55); ship.add(lantern1);
+  const lantern2 = lantern1.clone();
+  lantern2.position.set(1.7, 0.45, -0.55); ship.add(lantern2);
+
+  /* mizSail kept as second sail; reference for animation */
+  const foreSail = mizSail;
+
+  ship.rotation.y = -0.45;
+  ship.position.y = 0.2;
+
+  const sparkGeo = new THREE.BufferGeometry();
+  const sparkCount = 100;
+  const positions = new Float32Array(sparkCount * 3);
+  for (let i = 0; i < sparkCount; i++) {
+    positions[i*3+0] = (Math.random() - 0.5) * 10;
+    positions[i*3+1] = Math.random() * 4;
+    positions[i*3+2] = (Math.random() - 0.5) * 10;
+  }
+  sparkGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  const sparkMat = new THREE.PointsMaterial({ color: 0xf5c542, size: 0.05, transparent: true, opacity: 0.85 });
+  const sparks = new THREE.Points(sparkGeo, sparkMat);
+  scene.add(sparks);
+
+  let mouseX = 0, mouseY = 0;
+  wrap.addEventListener('mousemove', e => {
+    const r = wrap.getBoundingClientRect();
+    mouseX = ((e.clientX - r.left) / r.width - 0.5) * 2;
+    mouseY = ((e.clientY - r.top) / r.height - 0.5) * 2;
+  });
+
+  let t = 0;
+  function animate() {
+    t += 0.012;
+    ship.rotation.y = -0.45 + Math.sin(t * 0.6) * 0.06;
+    ship.rotation.z = Math.sin(t * 1.4) * 0.03;
+    ship.position.y = 0.2 + Math.sin(t * 1.4) * 0.07;
+
+    const flagWave = Math.sin(t * 4) * 0.25;
+    [flag, skull, skullEyeL, skullEyeR, bone1, bone2, hatBrim, hatTop, hatBand].forEach(p => p.rotation.y = flagWave);
+
+    const mainWave = Math.sin(t * 2) * 0.08;
+    const mizWave  = Math.sin(t * 2 + 1) * 0.08;
+    mainSail.rotation.y = mainWave;
+    mizSail.rotation.y  = mizWave;
+    sunDisc.rotation.y  = mainWave;
+    sunEyeL.rotation.y  = mainWave;
+    sunEyeR.rotation.y  = mainWave;
+    sunSmile.rotation.y = mainWave;
+    sunRays.rotation.y  = mainWave;
+    miniSun.rotation.y  = mizWave;
+
+    /* paddle wheels spin */
+    paddleL.rotation.x += 0.05;
+    paddleR.rotation.x += 0.05;
+
+    /* sun rays slow rotation around the sun */
+    sunRays.children.forEach((r, i) => {
+      const base = (i / 12) * Math.PI * 2;
+      const ang = base + Math.sin(t * 0.5) * 0.04;
+      r.position.x = 0.2 + Math.cos(ang) * 0.55;
+      r.position.y = 1.7 + Math.sin(ang) * 0.55;
+      r.rotation.z = ang - Math.PI / 2;
+    });
+
+    for (let i = 0; i < oceanPos.count; i++) {
+      const x = oceanPos.getX(i);
+      const z = oceanPos.getY(i);
+      const y = Math.sin(x * 0.6 + t * 1.6) * 0.12 + Math.cos(z * 0.5 + t * 1.2) * 0.1;
+      oceanPos.setZ(i, y);
+    }
+    oceanPos.needsUpdate = true;
+    oceanGeo.computeVertexNormals();
+
+    lantern.intensity = 2.4 + Math.sin(t * 8) * 0.4;
+
+    const pos = sparks.geometry.attributes.position.array;
+    for (let i = 0; i < sparkCount; i++) {
+      pos[i*3+1] += 0.006;
+      pos[i*3+0] += Math.sin(t + i) * 0.002;
+      if (pos[i*3+1] > 4) pos[i*3+1] = -0.5;
+    }
+    sparks.geometry.attributes.position.needsUpdate = true;
+
+    const targetX = 5.6 + mouseX * 0.8;
+    const targetY = 3.4 + mouseY * -0.5;
+    camera.position.x += (targetX - camera.position.x) * 0.05;
+    camera.position.y += (targetY - camera.position.y) * 0.05;
+    camera.lookAt(0, 1.0, 0);
+
+    renderer.render(scene, camera);
+    requestAnimationFrame(animate);
+  }
+  animate();
+})();
+</script>
+
+</body>
+</html>

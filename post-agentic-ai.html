@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>From Bank Vaults to Agentic Crews · Keerthan Nekkanti</title>
+<link href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Cinzel:wght@500;700;900&family=IM+Fell+English:ital@0;1&family=Special+Elite&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#07090f;--panel:rgba(20,16,10,0.86);--panel-2:rgba(36,28,16,0.78);
+    --parchment:#f4e1b6;--ink:#1a0f05;
+    --line:rgba(244,225,182,0.16);--line-strong:rgba(244,225,182,0.32);
+    --gold:#f5c542;--gold-deep:#c89b1f;--blood:#c42b1c;--blood-bright:#e53935;
+    --sea:#1976d2;--text:#f4e6c8;--muted:#b89968;
+    --pirate:'Pirata One',cursive;--display:'Cinzel',serif;
+    --body:'IM Fell English','Crimson Text',serif;
+    --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,monospace;
+  }
+  *{box-sizing:border-box;}html{scroll-behavior:smooth;}
+  body{margin:0;font-family:var(--body);color:var(--text);
+    background:
+      radial-gradient(1200px 600px at 80% -10%,rgba(196,43,28,0.18),transparent 60%),
+      radial-gradient(900px 500px at -10% 30%,rgba(25,118,210,0.12),transparent 55%),
+      linear-gradient(180deg,#06070d 0%,#0a1020 100%);
+    line-height:1.7;letter-spacing:0.01em;font-size:1.08rem;}
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    background-image:
+      repeating-linear-gradient(45deg,rgba(245,197,66,0.018) 0 2px,transparent 2px 4px),
+      repeating-linear-gradient(-45deg,rgba(244,225,182,0.012) 0 2px,transparent 2px 4px);
+    mix-blend-mode:screen;}
+  body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    background:repeating-linear-gradient(0deg,rgba(244,225,182,0.025) 0 1px,transparent 1px 3px);
+    opacity:0.3;mix-blend-mode:overlay;}
+  nav{position:sticky;top:0;backdrop-filter:blur(18px);background:rgba(7,9,15,0.84);z-index:50;border-bottom:1px solid var(--line);}
+  nav .nav-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:0.85rem 1.5rem;}
+  .brand{font-family:var(--display);font-weight:900;font-size:0.95rem;letter-spacing:0.22em;color:var(--parchment);}
+  .brand a{color:inherit;text-decoration:none;}
+  nav .back{font-family:var(--mono);font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);text-decoration:none;border:1px solid rgba(245,197,66,0.5);padding:0.45rem 0.95rem;border-radius:3px;}
+  nav .back:hover{background:rgba(245,197,66,0.08);}
+  article{max-width:760px;margin:0 auto;padding:4rem 1.5rem 6rem;position:relative;z-index:2;}
+  .stencil{font-family:var(--mono);font-size:0.7rem;letter-spacing:0.32em;text-transform:uppercase;color:var(--gold);margin-bottom:1.2rem;display:flex;align-items:center;gap:0.8rem;}
+  .stencil::before,.stencil::after{content:"";flex:0 0 38px;height:1px;background:var(--gold);opacity:0.6;}
+  .stencil::after{flex:1;}
+  h1{font-family:var(--pirate);font-weight:400;font-size:clamp(2.4rem,4.6vw,4rem);line-height:1.05;margin:0 0 0.6rem;color:var(--parchment);text-shadow:2px 2px 0 #000,4px 4px 0 rgba(196,43,28,0.45);letter-spacing:0.02em;}
+  .lede{font-family:var(--body);font-style:italic;color:var(--gold);font-size:1.2rem;border-left:3px solid var(--blood);padding-left:1rem;margin:1.6rem 0 2.5rem;}
+  .meta{font-family:var(--mono);font-size:0.7rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--muted);margin-bottom:0.5rem;}
+  .meta b{color:var(--gold);}
+  h2{font-family:var(--display);font-weight:700;font-size:1.55rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--parchment);margin-top:3rem;margin-bottom:0.8rem;border-bottom:1px dashed var(--line-strong);padding-bottom:0.4rem;}
+  h3{font-family:var(--display);font-weight:600;font-size:1.2rem;color:var(--gold);margin-top:1.8rem;margin-bottom:0.4rem;}
+  p{margin:0.8rem 0;color:#dccfae;}
+  blockquote{border-left:3px solid var(--gold);padding:0.6rem 1.1rem;margin:1.2rem 0;font-style:italic;background:rgba(245,197,66,0.05);color:var(--parchment);}
+  ul,ol{padding-left:1.4rem;}
+  li{margin:0.4rem 0;color:#dccfae;}
+  li::marker{color:var(--blood);}
+  b,strong{color:var(--gold);}
+  code{font-family:var(--mono);font-size:0.92em;color:var(--gold);background:rgba(245,197,66,0.08);padding:0.1rem 0.4rem;border-radius:3px;}
+  .crew{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0.8rem;margin:1.8rem 0;}
+  .crew div{padding:0.95rem 1rem;border:1px solid var(--line);border-radius:4px;background:var(--panel);border-left:3px solid var(--gold);}
+  .crew .h{font-family:var(--display);font-weight:700;color:var(--parchment);text-transform:uppercase;letter-spacing:0.06em;font-size:0.9rem;margin-bottom:0.3rem;}
+  .crew .d{font-family:var(--mono);font-size:0.7rem;color:var(--muted);letter-spacing:0.05em;}
+  hr{border:none;border-top:1px dashed var(--line-strong);margin:2.5rem 0;}
+  footer{max-width:760px;margin:0 auto;padding:0 1.5rem 4rem;color:var(--muted);font-family:var(--mono);font-size:0.72rem;letter-spacing:0.22em;text-transform:uppercase;}
+  footer .sig{color:var(--gold);}
+  .next{display:flex;justify-content:space-between;align-items:center;gap:1rem;margin-top:2rem;padding:1rem 1.2rem;border:1px solid var(--line);border-radius:4px;background:var(--panel);font-family:var(--mono);font-size:0.78rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--parchment);text-decoration:none;}
+  .next:hover{border-color:var(--gold);background:rgba(245,197,66,0.05);}
+  .next .arr{color:var(--gold);}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="brand"><a href="index.html">⚓ KEERTHAN · NEKKANTI</a></div>
+    <a class="back" href="index.html#blog">‹ Back to Den Den Mushi</a>
+  </div>
+</nav>
+
+<article>
+  <div class="stencil">Den Den Mushi · Lap 03 · 2026</div>
+  <h1>From Bank Vaults to Agentic Crews</h1>
+  <div class="meta"><b>BUILDING AI THAT ACTS, NOT JUST ANSWERS</b> · 13 MIN READ · KEERTHAN NEKKANTI</div>
+  <p class="lede">For three years at Bank of America I shipped neural networks that watched 10 million transactions a week, NLP models that hunted money laundering patterns, and a synthetic data engine that let the world's compliance teams build without ever touching production. Then I started MapShock, an agentic AI platform with 46 specialists. The lesson, in both: a great pirate captain doesn't do everything — they assemble a crew.</p>
+
+  <h2>The shape of an agentic system</h2>
+  <p>The simplest way I can describe an agentic AI system to a non-engineer is this:</p>
+  <blockquote>A regular AI <b>answers</b>. An agentic AI <b>does</b>. It plans, calls tools, reads what comes back, decides what to do next, and only stops when the job is finished — or when the captain says stop.</blockquote>
+  <p>Concretely, every serious agentic system I've shipped or studied has the same five layers, regardless of stack:</p>
+  <div class="crew">
+    <div><div class="h">1 · Captain</div><div class="d">Top-level orchestrator. Decomposes goal into tasks.</div></div>
+    <div><div class="h">2 · Crew of specialists</div><div class="d">Domain agents. Finance, geopolitics, supply chain, etc.</div></div>
+    <div><div class="h">3 · Tools</div><div class="d">APIs, search, code execution, databases, sensors.</div></div>
+    <div><div class="h">4 · Memory &amp; state</div><div class="d">What was tried, what was learned, what was cited.</div></div>
+    <div><div class="h">5 · Quality gates</div><div class="d">Verification, evaluation, human-in-the-loop checkpoints.</div></div>
+  </div>
+
+  <h2>What banking taught me about agentic systems</h2>
+
+  <h3>Lesson 1 — Real systems live and die by their controls</h3>
+  <p>At BofA the system that mattered most wasn't the model itself — it was the <b>quality framework around it</b>. We absorbed a 60% volume surge with zero downtime not because the algorithm was magical, but because the data quality controls, retries, and observability layers were treated as first-class engineering. The same is true for agents.</p>
+  <p>An agent that hallucinates a citation in a research workflow is the same kind of failure as a pipeline that silently drops a million sanctions records. The fix is not "a better model." The fix is <b>structured verification</b>. That is exactly why I baked a <b>6-gate quality pipeline</b> into MapShock — every analytical claim from any of the 46 agents has to come back with cited, timestamped evidence, or the captain rejects it.</p>
+
+  <h3>Lesson 2 — Specialization beats generality, until orchestration shows up</h3>
+  <p>One huge model can do a hundred jobs poorly. A hundred small specialists can do them well, but a hundred specialists with no captain is chaos. The hardest engineering in agentic systems isn't building the agents — it's <b>routing</b>, <b>state management</b>, and <b>conflict resolution</b> when two agents disagree.</p>
+  <p>This is exactly the fraud-detection problem I worked on in a different costume. Multiple models, each looking at part of the picture; one orchestrator deciding what to escalate, what to dismiss, and how to explain the call.</p>
+
+  <h3>Lesson 3 — Synthetic data is the cheat code</h3>
+  <p>One of the proudest things I shipped at BofA was a synthetic data generation engine — a model that produced compliant fake data so global teams could build apps without ever touching protected production records. The same pattern is becoming critical for agentic AI:</p>
+  <ul>
+    <li>You cannot test an agent at scale on real users without serious risk.</li>
+    <li>Synthetic environments — simulated markets, synthetic case files, fake user journeys — let you stress-test before anyone gets hurt.</li>
+    <li>Synthetic data is also how you fairly evaluate agents on rare-but-critical scenarios that real data underrepresents.</li>
+  </ul>
+
+  <h2>Why I built MapShock</h2>
+  <p>MapShock came out of a simple frustration. Strategic intelligence work — the kind of thing consulting firms charge huge fees for — is mostly an <b>orchestration problem</b>. You need a researcher, a finance analyst, a geopolitics expert, a cyber analyst, a supply-chain person, and an editor, all coordinated, all citing their sources, all hitting deadline.</p>
+  <p>Modern LLMs can play any of those roles individually. The interesting question is whether they can play them <em>together</em> — like a Straw Hat crew, each member doing what they're good at, captain holding the wheel.</p>
+
+  <h3>How the platform is structured</h3>
+  <ul>
+    <li><b>46 specialized agents</b> — each tuned to a domain (macro finance, geopolitics, cybersecurity, supply chain, regulatory) with its own retrieval surface and prompting strategy.</li>
+    <li><b>Protocol-driven orchestrator</b> — instead of one giant prompt, the orchestrator runs a deterministic protocol that decides which agents to call, in what order, with what context.</li>
+    <li><b>6-gate quality pipeline</b> — every output is checked for source attribution, recency, internal consistency, refutability, factual grounding, and final coherence. Anything that fails goes back for revision.</li>
+    <li><b>Cited &amp; timestamped evidence</b> — there is no "trust me" output. Every claim points to a source with a date.</li>
+  </ul>
+
+  <h2>The mistakes I see most people make</h2>
+  <ul>
+    <li><b>Building agents before defining the workflow.</b> If you cannot draw the workflow as a flowchart, do not give it to an agent. The agent will just hide your missing process behind plausible language.</li>
+    <li><b>Ignoring evaluation until the demo works.</b> A demo that works once is not a system. You need an evaluation harness before you scale.</li>
+    <li><b>Confusing "the model called the API" with "the agent finished the job."</b> Tool use is the easy part. Knowing when the job is actually done is the hard part.</li>
+    <li><b>Treating safety as a moderation filter.</b> True safety in agentic systems comes from constraints, scopes, sandboxes, and structured verification — not just a refusal classifier.</li>
+  </ul>
+
+  <blockquote>The Straw Hats almost never won by being individually the strongest. They won because every member fit a slot and the captain trusted them with it. Agentic AI is the same engineering discipline, written in code.</blockquote>
+
+  <h2>What the next two years probably look like</h2>
+  <ol>
+    <li><b>Agents go vertical.</b> Generic "do anything" agents will lose to deeply specialized agents wired into specific workflows: legal review, financial diligence, code review, compliance, customer ops.</li>
+    <li><b>Evaluation becomes a profession.</b> The most valuable engineers in AI shops over the next two years won't be model builders — they'll be the people who design honest evaluations.</li>
+    <li><b>Memory becomes the product.</b> The agent that remembers your business correctly across sessions is far more valuable than the one that's smart for ten minutes and forgets.</li>
+    <li><b>Quality gates go from optional to default.</b> Anything that ships into a regulated context will require structured verification by construction. The 6-gate idea will become normal infrastructure.</li>
+  </ol>
+
+  <h2>What I bring to this fight</h2>
+  <p>Three years of shipping AI under real compliance pressure at one of the world's largest banks taught me that <b>controls are not paperwork — they are how you build things that don't quietly destroy the people who use them</b>. An MSBA at Tepper is teaching me to translate that engineering instinct into business decisions and strategy. MapShock is where I'm putting both halves together.</p>
+
+  <hr>
+
+  <p>If any of this resonates — if you're building agentic systems, sensory AI, or compliance-grade ML and you want a software engineer who has shipped at scale and thinks in terms of crews, controls, and storms — the Den Den Mushi is open.</p>
+
+  <a class="next" href="index.html#contact">Set Sail · Contact the Captain <span class="arr">›</span></a>
+</article>
+
+<footer>
+  © 2026 · Keerthan Nekkanti · <span class="sig">KN-28 · Captain of the Data Pirates</span>
+</footer>
+
+</body>
+</html>
